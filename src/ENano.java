@@ -3,6 +3,8 @@ import java.util.*;
 import fi.iki.elonen.NanoHTTPD;
 import static fi.iki.elonen.NanoHTTPD.MIME_HTML;
 import static fi.iki.elonen.NanoHTTPD.Response;
+import java.util.logging.Level; 
+import java.util.logging.Logger; 
 
 /**
  * Author : Braslyn Rodriguez Ramirez -- Braslynrrr999@gmail.com
@@ -11,65 +13,46 @@ import static fi.iki.elonen.NanoHTTPD.Response;
 
 public class ENano extends NanoHTTPD
 {
-	//static final int HTTP_OK=200;
+	
+	Logger logger = Logger.getLogger(ENano.class.getName()); 
+	
 	public ENano(int port) throws IOException{
 		super(port);
 		start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
 	}
-
+	
+	
     @Override
     public Response serve(IHTTPSession session){
-		/*try{
-			
-		var file=new File("./web/index.html");
-        var fis = new FileInputStream(file);
-		String sfile="";
-		}catch(...){
-			sfile="Hola";
-		}
-		sfile=newFixedLengthResponse(getFileContent(fis,sfile));
-		return sfile;
-		*/
-		
-		 StringBuilder contentBuilder = new StringBuilder();
-			try {
-				BufferedReader in = new BufferedReader(new FileReader("./web/index.html"));
-				String str;
-				while ((str = in.readLine()) != null) {
-					contentBuilder.append(str);
-				}
-				in.close();
-			} catch (IOException e) {
+		String content;
+		logger.log(Level.INFO, "Connection to "+session.getRemoteIpAddress());
+		StringBuilder contentBuilder = new StringBuilder();
+		try {
+			BufferedReader in = new BufferedReader(new FileReader("./web/index.html"));
+			String str;
+			while ((str = in.readLine()) != null) {
+				contentBuilder.append(str);
 			}
-		String content = contentBuilder.toString(); 
+			in.close();
+			content= contentBuilder.toString(); 
+		}catch (IOException e) {
+		    content= e.getMessage();
+		}
 			return newFixedLengthResponse(content);
     }
 
 
-	public static String getFileContent(FileInputStream fis,String encoding ) throws IOException{
-		  try( BufferedReader br = new BufferedReader( new InputStreamReader(fis, encoding ))){
-		  StringBuilder sb = new StringBuilder();
-		  String line;
-			while(( line = br.readLine()) != null ) {
-				sb.append( line );
-				sb.append( '\n' );
-			}
-		    return sb.toString();
-	    }
-	}
-	
 	public static void main( String[] args ){
-		try
-		{
-			new ENano(5741);
-			
+		int port= args.length>0? Integer.parseInt(args[1]):5231;
+		try{
+			new ENano(port);
 		}
 		catch( IOException ioe )
 		{
 			System.err.println( "Couldn't start server:\n" + ioe );
 			System.exit( -1 );
 		}
-		System.out.println( "Listening on port "+args[0]+". Hit Enter to stop.\n" );
+		System.out.println( "Listening on port "+port+". Hit Enter to stop.\n" );
 		try { System.in.read(); } catch( Throwable t ) {};
 	}
 }

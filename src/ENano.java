@@ -1,10 +1,11 @@
 import java.io.*;
 import java.util.*;
 import fi.iki.elonen.NanoHTTPD;
+import static fi.iki.elonen.NanoHTTPD.MIME_HTML;
 import static fi.iki.elonen.NanoHTTPD.Response;
 
 /**
- * An example of subclassing NanoHTTPD to make a custom HTTP server.
+ * Author : Braslyn Rodriguez Ramirez -- Braslynrrr999@gmail.com
  */
  
 
@@ -12,38 +13,37 @@ public class ENano extends NanoHTTPD
 {
 	//static final int HTTP_OK=200;
 	public ENano(int port) throws IOException{
-		super("Enano", port);
+		super(port);
+		start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
 	}
 
-	public Response serve( String uri, String method, Properties header, Properties parms, Properties files )
-	{
-		System.out.println( method + " '" + uri + "' " );
+    @Override
+    public Response serve(IHTTPSession session) {
 		String msg = "<html><body><h1>Hello server</h1>\n";
-		if ( parms.getProperty("username") == null )
-			msg +=
-				"<form action='?' method='get'>\n" +
-				"  <p>Your name: <input type='text' name='username'></p>\n" +
-				"</form>\n";
-		else
-			msg += "<p>Hello, " + parms.getProperty("username") + "!</p>";
-
-		msg += "</body></html>\n";
-		return new NanoHTTPD.Response( HTTP_OK, MIME_HTML, msg );
-	}
+		Map<String, String> parms = session.getParms();
+		if (parms.get("username") == null) {
+			msg += "<form action='?' method='get'>\n  <p>Your name: <input type='text' name='username'></p>\n" + "</form>\n";
+		} else {
+			msg += "<p>Hello, " + parms.get("username") + "!</p>";
+		}
+		return newFixedLengthResponse(msg + "</body></html>\n");
+    }
 
 
 	public static void main( String[] args )
 	{
+		int port= Integer
 		try
 		{
-			new ENano(8080);
+			new ENano(5741);
+			
 		}
 		catch( IOException ioe )
 		{
 			System.err.println( "Couldn't start server:\n" + ioe );
 			System.exit( -1 );
 		}
-		System.out.println( "Listening on port 8080. Hit Enter to stop.\n" );
+		System.out.println( "Listening on port "+args[0]+". Hit Enter to stop.\n" );
 		try { System.in.read(); } catch( Throwable t ) {};
 	}
 }

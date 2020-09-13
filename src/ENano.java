@@ -18,21 +18,47 @@ public class ENano extends NanoHTTPD
 	}
 
     @Override
-    public Response serve(IHTTPSession session) {
-		String msg = "<html><body><h1>Hello server</h1>\n";
-		Map<String, String> parms = session.getParms();
-		if (parms.get("username") == null) {
-			msg += "<form action='?' method='get'>\n  <p>Your name: <input type='text' name='username'></p>\n" + "</form>\n";
-		} else {
-			msg += "<p>Hello, " + parms.get("username") + "!</p>";
+    public Response serve(IHTTPSession session){
+		/*try{
+			
+		var file=new File("./web/index.html");
+        var fis = new FileInputStream(file);
+		String sfile="";
+		}catch(...){
+			sfile="Hola";
 		}
-		return newFixedLengthResponse(msg + "</body></html>\n");
+		sfile=newFixedLengthResponse(getFileContent(fis,sfile));
+		return sfile;
+		*/
+		
+		 StringBuilder contentBuilder = new StringBuilder();
+			try {
+				BufferedReader in = new BufferedReader(new FileReader("./web/index.html"));
+				String str;
+				while ((str = in.readLine()) != null) {
+					contentBuilder.append(str);
+				}
+				in.close();
+			} catch (IOException e) {
+			}
+		String content = contentBuilder.toString(); 
+			return newFixedLengthResponse(content);
     }
 
 
-	public static void main( String[] args )
-	{
-		int port= Integer
+	public static String getFileContent(FileInputStream fis,String encoding ) throws IOException{
+		  try( BufferedReader br = new BufferedReader( new InputStreamReader(fis, encoding ))){
+		  StringBuilder sb = new StringBuilder();
+		  String line;
+			while(( line = br.readLine()) != null ) {
+				sb.append( line );
+				sb.append( '\n' );
+			}
+		    return sb.toString();
+	    }
+	}
+	
+	public static void main( String[] args ){
 		try
 		{
 			new ENano(5741);

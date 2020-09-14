@@ -64,3 +64,5 @@ completed(6, 0.0, 214, 200, ok).
 completed(7, 0.0, 214, 200, ok).
 /*Sun Sep 13 17:57:54 2020*/ request(8, 1600041474.501, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),origin(null),connection('keep-alive')]).
 completed(8, 0.0, 214, 200, ok).
+/*Sun Sep 13 18:12:10 2020*/ request(9, 1600042330.362, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),origin(null),connection('keep-alive')]).
+completed(9, 0.0, 214, 200, ok).

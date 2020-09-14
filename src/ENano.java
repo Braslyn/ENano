@@ -4,7 +4,11 @@ import fi.iki.elonen.NanoHTTPD;
 import static fi.iki.elonen.NanoHTTPD.MIME_HTML;
 import static fi.iki.elonen.NanoHTTPD.Response;
 import java.util.logging.Level; 
-import java.util.logging.Logger; 
+import java.util.logging.Logger;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Author : Braslyn Rodriguez Ramirez -- Braslynrrr999@gmail.com
@@ -23,8 +27,7 @@ public class ENano extends NanoHTTPD{
 	private final List<String> ALLOWED_SITES= Arrays.asList("same-site","same-origin");
     @Override
     public Response serve(IHTTPSession session){
-		String content;
-		logger.log(Level.INFO, "Connection to "+session.getRemoteIpAddress());
+		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+"-> "+session.getUri());
 		StringBuilder contentBuilder = new StringBuilder();
 		String origin="none";
 		/*var request_header= session.getHeaders();
@@ -39,8 +42,45 @@ public class ENano extends NanoHTTPD{
 		}
 		*/
 		//response.addHeader("Content-Disposition: attachment; filename=", "./web/index.html");
+		Response response;
+		switch(session.getUri()){
+			case "/":
+				response = newFixedLengthResponse(filetoString("./web/index.html"));
+				break;
+			case "/css/form.css":
+				response = newFixedLengthResponse(filetoString("./web/css/form.css"));
+				break;
+			case "/js/Main.js":
+				response = newFixedLengthResponse(filetoString("./web/js/Main.js"));
+				break;
+			default:
+			response = newFixedLengthResponse(filetoString("./web/index.html"));
+		}
+		response.addHeader("Access-Control-Allow-Origin",origin);
+		return response;
+    }
+	private static Response makeresponse(String route){
+		 try {
+            Path path = Paths.get(route);
+            final Response resp = newFixedLengthResponse(
+                    Response.Status.OK,
+                    "text/plain",
+                    Files.newInputStream(path),
+                    Files.size(path)
+            );
+            resp.addHeader("Content-Disposition", "attachment; filename=\"+"route"+\"");
+            return resp;
+        } catch (final Exception ex) { // TODO: Error handling is bad
+            ex.printStackTrace();
+            return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "ERROR");
+        }
+	}
+	
+	private static String filetoString(String route){
+		StringBuilder contentBuilder = new StringBuilder();
+		String content;
 		try {
-			BufferedReader in = new BufferedReader(new FileReader("./web/index.html"));
+			BufferedReader in = new BufferedReader(new FileReader(route));
 			String str;
 			while ((str = in.readLine()) != null) {
 				contentBuilder.append(str);
@@ -50,12 +90,8 @@ public class ENano extends NanoHTTPD{
 		}catch (IOException e) {
 		    content= e.getMessage();
 		}
-		
-		Response response= newFixedLengthResponse(content);
-		response.addHeader("Access-Control-Allow-Origin",origin);
-		return response;
-    }
-
+		return content;
+	}
 
 	public static void main( String[] args ){
 		int port= args.length>0? Integer.parseInt(args[1]):5231;

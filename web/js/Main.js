@@ -1,5 +1,4 @@
 function init_app(){
-	alert("xd")
 	$("#about").click(showAbout);
     writeAuthors();
 }

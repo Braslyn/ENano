@@ -66,3 +66,12 @@ completed(7, 0.0, 214, 200, ok).
 completed(8, 0.0, 214, 200, ok).
 /*Sun Sep 13 18:12:10 2020*/ request(9, 1600042330.362, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),origin(null),connection('keep-alive')]).
 completed(9, 0.0, 214, 200, ok).
+/*Sun Sep 13 18:54:46 2020*/ request(10, 1600044886.416, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),referer('http://localhost:5231/'),origin('http://localhost:5231'),connection('keep-alive')]).
+completed(10, 0.0, 214, 200, ok).
+/*Sun Sep 13 19:01:27 2020*/ request(11, 1600045287.821, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),referer('http://localhost:5231/'),origin('http://localhost:5231'),connection('keep-alive')]).
+completed(11, 0.015625000000000007, 214, 200, ok).
+/*Sun Sep 13 19:03:37 2020*/ request(12, 1600045417.289, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),referer('http://localhost:5231/'),origin('http://localhost:5231'),connection('keep-alive')]).
+completed(12, 0.0, 214, 200, ok).
+/*Sun Sep 13 19:05:53 2020*/ request(13, 1600045553.971, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),referer('http://localhost:5231/'),origin('http://localhost:5231'),connection('keep-alive')]).
+completed(13, 0.0, 214, 200, ok).
+server(stopped, 1600046272).

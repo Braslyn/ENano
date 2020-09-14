@@ -29,7 +29,7 @@ public class ENano extends NanoHTTPD{
     public Response serve(IHTTPSession session){
 		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+"-> "+session.getUri());
 		StringBuilder contentBuilder = new StringBuilder();
-		String origin="none";
+		String origin="*";
 		/*var request_header= session.getHeaders();
 		
 		boolean cors_allowed= request_header!=null && 
@@ -45,30 +45,29 @@ public class ENano extends NanoHTTPD{
 		Response response;
 		switch(session.getUri()){
 			case "/":
-				response = newFixedLengthResponse(filetoString("./web/index.html"));
+				response = makeResponse("./web/index.html",MIME_HTML);
 				break;
 			case "/css/form.css":
-				response = newFixedLengthResponse(filetoString("./web/css/form.css"));
+				response = makeResponse("./web/css/form.css","text/css");
 				break;
 			case "/js/Main.js":
-				response = newFixedLengthResponse(filetoString("./web/js/Main.js"));
+				response = makeResponse("./web/js/Main.js","text/javascript");
 				break;
 			default:
-			response = newFixedLengthResponse(filetoString("./web/index.html"));
+			response = makeResponse("./web/index.html",MIME_HTML);
 		}
 		response.addHeader("Access-Control-Allow-Origin",origin);
 		return response;
     }
-	private static Response makeresponse(String route){
+	private static Response makeResponse(String route,String type){
 		 try {
             Path path = Paths.get(route);
-            final Response resp = newFixedLengthResponse(
+            Response resp = newFixedLengthResponse(
                     Response.Status.OK,
-                    "text/plain",
+                    type,
                     Files.newInputStream(path),
                     Files.size(path)
             );
-            resp.addHeader("Content-Disposition", "attachment; filename=\"+"route"+\"");
             return resp;
         } catch (final Exception ex) { // TODO: Error handling is bad
             ex.printStackTrace();
@@ -76,23 +75,6 @@ public class ENano extends NanoHTTPD{
         }
 	}
 	
-	private static String filetoString(String route){
-		StringBuilder contentBuilder = new StringBuilder();
-		String content;
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(route));
-			String str;
-			while ((str = in.readLine()) != null) {
-				contentBuilder.append(str);
-			}
-			in.close();
-			content= contentBuilder.toString(); 
-		}catch (IOException e) {
-		    content= e.getMessage();
-		}
-		return content;
-	}
-
 	public static void main( String[] args ){
 		int port= args.length>0? Integer.parseInt(args[1]):5231;
 		try{

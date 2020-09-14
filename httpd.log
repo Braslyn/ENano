@@ -75,3 +75,16 @@ completed(12, 0.0, 214, 200, ok).
 /*Sun Sep 13 19:05:53 2020*/ request(13, 1600045553.971, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),referer('http://localhost:5231/'),origin('http://localhost:5231'),connection('keep-alive')]).
 completed(13, 0.0, 214, 200, ok).
 server(stopped, 1600046272).
+server(started, 1600046867).
+/*Sun Sep 13 19:27:47 2020*/ request(1, 1600046867.429, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),connection('keep-alive'),upgrade_insecure_requests('1')]).
+completed(1, 0.03125, 214, 200, ok).
+/*Sun Sep 13 19:28:34 2020*/ request(2, 1600046914.608, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),referer('http://localhost:5231/'),origin('http://localhost:5231'),connection('keep-alive')]).
+completed(2, 0.0, 214, 200, ok).
+server(stopped, 1600047569).
+server(started, 1600047988).
+/*Sun Sep 13 19:46:28 2020*/ request(1, 1600047988.078, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),referer('http://localhost:5231/'),origin('http://localhost:5231'),connection('keep-alive')]).
+completed(1, 0.015625, 214, 200, ok).
+server(stopped, 1600048424).
+server(started, 1600048432).
+/*Sun Sep 13 19:53:52 2020*/ request(1, 1600048432.217, [peer(ip(127,0,0,1)),method(get),request_uri('/teste'),path('/teste'),http_version(1-1),host(localhost),port(3000),user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'),referer('http://localhost:5231/'),origin('http://localhost:5231'),connection('keep-alive')]).
+completed(1, 0.015625, 214, 200, ok).

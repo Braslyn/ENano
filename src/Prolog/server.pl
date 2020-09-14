@@ -16,11 +16,12 @@
 										   % E.g. point(X,Y) vs. object([x=X,y=Y]).
 :- use_module(library(http/http_json)). 
 :- use_module(library(http/http_client)). 
- :- [teste].
+:- [teste].
 
 :- initialization(server).
 
 server :- server(3000).
+:- set_setting(http:cors, [*]).
 server(Port) :-
         http_server(http_dispatch, [port(Port)]).
 stop_server(Port) :- http_stop_server(Port,[]).
@@ -28,7 +29,7 @@ stop_server(Port) :- http_stop_server(Port,[]).
 :- http_handler('/teste', say_teste, []).
 
 
-say_teste(_Request):-listAllUsers(List),					
+say_teste(_Request):-cors_enable,listAllUsers(List),					
 prolog_to_json(estu(List), JSON_Object),
 reply_json(JSON_Object).
 

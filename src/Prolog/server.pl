@@ -1,3 +1,6 @@
+%Autor Braslyn Rodriguez Ramirez
+%Autor Enrique Mendez Cabezas
+%Autor Phillipe Gairaud Quezada
 :- use_module(library(http/http_parameters)).
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).

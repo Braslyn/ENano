@@ -11,8 +11,7 @@ import java.util.logging.Logger;
  */
  
 
-public class ENano extends NanoHTTPD
-{
+public class ENano extends NanoHTTPD{
 	
 	Logger logger = Logger.getLogger(ENano.class.getName()); 
 	
@@ -21,12 +20,25 @@ public class ENano extends NanoHTTPD
 		start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
 	}
 	
-	
+	private final List<String> ALLOWED_SITES= Arrays.asList("same-site","same-origin");
     @Override
     public Response serve(IHTTPSession session){
 		String content;
 		logger.log(Level.INFO, "Connection to "+session.getRemoteIpAddress());
 		StringBuilder contentBuilder = new StringBuilder();
+		String origin="none";
+		/*var request_header= session.getHeaders();
+		
+		boolean cors_allowed= request_header!=null && 
+								"cors".equals(request_header.get("sec-fetch-mode"))&&
+								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0
+								&& (origin=request_header.get("origin"))!=null;
+		Response response= super.serve(session);
+		if (cors_allowed){
+			response.addHeader("Access-Control-Allow-Origin",origin);
+		}
+		*/
+		//response.addHeader("Content-Disposition: attachment; filename=", "./web/index.html");
 		try {
 			BufferedReader in = new BufferedReader(new FileReader("./web/index.html"));
 			String str;
@@ -38,7 +50,10 @@ public class ENano extends NanoHTTPD
 		}catch (IOException e) {
 		    content= e.getMessage();
 		}
-			return newFixedLengthResponse(content);
+		
+		Response response= newFixedLengthResponse(content);
+		response.addHeader("Access-Control-Allow-Origin",origin);
+		return response;
     }
 
 

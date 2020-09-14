@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+	<meta charset="UTF-8">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
 		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<link rel="stylesheet" href="css/form.css">
@@ -9,8 +9,7 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
 		integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
 		crossorigin="anonymous"></script>
-	
-
+	<script src="js/Main.js"></script>
 	<title>E-nano</title>
 </head>
 
@@ -41,22 +40,7 @@
 			<div class="modal-header">
 			  <h5 class="modal-title">About</h5>
 			</div>
-			<div class="modal-body">
-			  <h5>Authors: </h5>
-			  <p>Braslyn Rodríguez</p>
-			  <p>Enrique Méndez</p>
-			  <p>Philippe Gairaud</p>
-			  <h5>NRC 50058</h5>
-			  <p>Group 02</p>
-			  <h5>Version</h5>
-			  <p>0.0.0</p>
-			  <a href= "https://github.com/Braslyn/Paradigmas/tree/master/Proyectos">Repository</a>
-			
-			  <h5> <br>9/7/2020</h5>
-			  
-
-			  
-			  
+			<div class="modal-body" id="Modal">
 			</div>
 			<div class="modal-footer">
 			  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -64,21 +48,10 @@
 		  </div>
 		</div>
 	  </div>
-	<script>
-		function loaded() {
-			$("#about").click(showAbout);
-		}
-		function showAbout(){
-			$("#aboutModal").modal('show');
-		}
-		$(loaded);
-	</script>
-</body>
 
-
-
-<footer>
+	<footer>
 	Grupo 02 E-nano 2020
-</footer>
+	</footer>
+</body>
 
 </html>

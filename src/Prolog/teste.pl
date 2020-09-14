@@ -1,4 +1,5 @@
 %Autor Enrique Mendez Cabezas
+%Autor Braslyn Rodriguez Ramirez
 :- use_module(library(record)). 
 :- use_module(library(http/json)).
 :- use_module(library(http/json_convert)).
@@ -15,7 +16,8 @@
 est(117390080,"Enrique Mendez Cabezas").
 est(402420750,"Braslyn Rodriguez Ramirez"). 
 est(117290193,"Phillip Gairaud Quesada").
-
+est(50058,"NRC").
+est(1,"Version").
 
 
 json_test(_Request) :-listAllUsers(List),					

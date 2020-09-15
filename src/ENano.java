@@ -17,6 +17,11 @@ import java.nio.file.Paths;
 
 public class ENano extends NanoHTTPD{
 	
+	
+	final String MIME_CSS="text/css";
+	final String MIME_JS="text/javascript";
+	final String MIME_ICO="image/x-icon";
+	
 	Logger logger = Logger.getLogger(ENano.class.getName()); 
 	
 	public ENano(int port) throws IOException{
@@ -48,10 +53,13 @@ public class ENano extends NanoHTTPD{
 				response = makeResponse("./web/index.html",MIME_HTML);
 				break;
 			case "/css/form.css":
-				response = makeResponse("./web/css/form.css","text/css");
+				response = makeResponse("./web/css/form.css",MIME_CSS);
 				break;
 			case "/js/Main.js":
-				response = makeResponse("./web/js/Main.js","text/javascript");
+				response = makeResponse("./web/js/Main.js",MIME_JS);
+				break;
+			case "/favicon.ico":
+				response = makeResponse("./web/favicon.ico",MIME_ICO);
 				break;
 			default:
 			response = makeResponse("./web/index.html",MIME_HTML);

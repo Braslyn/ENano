@@ -1,23 +1,27 @@
 %Autor Enrique Mendez Cabezas
 %Autor Braslyn Rodriguez Ramirez
+%Autor Philippe Gairaud Quesada
 :- use_module(library(record)). 
 :- use_module(library(http/json)).
 :- use_module(library(http/json_convert)).
 :- use_module(library(http/http_json)).
 
 %json objet
-  :- json_object estu(estu:list).
+  :- json_object estu(text).
 
 
 % %
 %FACTS
 % %
 
-est(117390080,"Enrique Mendez Cabezas").
-est(402420750,"Braslyn Rodriguez Ramirez"). 
-est(117290193,"Phillip Gairaud Quesada").
-est(50058,"NRC").
-est(1,"Version").
+est("Enrique Mendez Cabezas 117390080").
+est("Braslyn Rodriguez Ramirez 402420750"). 
+est("Philippe Gairaud Quesada 117290193").
+est("50058").
+est("06").
+est("1").
+est("https://github.com/Braslyn/ENano").
+est("9/14/2020").
 
 
 json_test(_Request) :-listAllUsers(List),					
@@ -25,6 +29,6 @@ json_test(_Request) :-listAllUsers(List),
     reply_json(JSON_Object).
 
 %lista de estudiantes
-listAllUsers(List):- findall(([U1,U2]), (est(U1, U2)), L1),
+listAllUsers(List):- findall(([U1]), (est(U1)), L1),
 append(L1, L2),
 list_to_set(L2, List).

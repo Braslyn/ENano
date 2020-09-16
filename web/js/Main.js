@@ -7,8 +7,8 @@ function init_app(){
 		theme: 'dracula' 
 	});
 	inputEditor.setSize(600, 500);
-
-
+	$("#clearInput").on("click", () => inputEditor.setValue(""));
+	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
 }
 
 function writeAuthors(){
@@ -26,13 +26,15 @@ function fillModal(json){
 	$("#repositoryLink").attr("href",json.text[6]);
 	$("#date").text(json.text[7]);
 }
-
+function saveCode(code){
+	var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
+	saveAs(blob, "code.txt");
+}
 
 function showAbout(){
 	$("#aboutModal").modal('show');
 }
-
-function writeModal(json){
-	alert(json);
+function clearOutput(){
+	$("#outputTextArea").val('');
 }
 window.addEventListener("load", init_app, false);

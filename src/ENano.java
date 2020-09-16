@@ -32,7 +32,7 @@ public class ENano extends NanoHTTPD{
 	private final List<String> ALLOWED_SITES= Arrays.asList("same-site","same-origin");
     @Override
     public Response serve(IHTTPSession session){
-		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+"-> "+session.getUri());
+		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
 		StringBuilder contentBuilder = new StringBuilder();
 		String origin="*";
 		/*var request_header= session.getHeaders();
@@ -77,23 +77,23 @@ public class ENano extends NanoHTTPD{
                     Files.size(path)
             );
             return resp;
-        } catch (final Exception ex) { // TODO: Error handling is bad
+        } catch (final Exception ex) { 
             ex.printStackTrace();
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "ERROR");
         }
 	}
 	
-	public static void main( String[] args ){
+	public static void main(String[] args){
 		int port= args.length>0? Integer.parseInt(args[1]):5231;
 		try{
 			new ENano(port);
 		}
 		catch( IOException ioe )
 		{
-			System.err.println( "Couldn't start server:\n" + ioe );
+			System.err.println( "Couldn't start server:\n" + ioe);
 			System.exit( -1 );
 		}
-		System.out.println( "Listening on port "+port+". Hit Enter to stop.\n" );
+		System.out.println( "Listening on port "+port+". Hit cntr+c twice to stop.\n" );
 		try { System.in.read(); } catch( Throwable t ) {};
 	}
 }

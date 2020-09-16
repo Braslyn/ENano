@@ -1,6 +1,14 @@
 function init_app(){
 	$("#about").click(showAbout);
-    writeAuthors();
+	writeAuthors();
+	var inputEditor = CodeMirror.fromTextArea
+	(document.getElementById('inputTextArea'), { 
+		lineNumbers: true,
+		theme: 'cobalt' 
+	});
+	inputEditor.setSize(600, 500);
+
+
 }
 
 function writeAuthors(){

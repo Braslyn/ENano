@@ -6,16 +6,20 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
 		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<link rel="stylesheet" href="css/form.css">
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.12/css/all.css">   
+	<link rel="stylesheet" href="codemirror/theme/cobalt.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.12/css/all.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
 		integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
 		crossorigin="anonymous"></script>
 	<script src="js/Main.js"></script>
+	<link rel="stylesheet" href="codemirror/lib/codemirror.css">
+	<script src="codemirror/lib/codemirror.js"></script>
+	<script src="codemirror/mode/javascript/javascript.js"></script>
 	<title>E-nano</title>
 </head>
 
-<body class="text-center">
+<body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
 			aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,13 +49,13 @@
 					<button type="button" class="btn btn-success">RUN
 						<i class="fas fa-play"></i>
 					</button>
-				  </div>
+				</div>
 			</div>
 			<div class="col-sm-6">
 				<form>
 					<div class="form-group">
 						<label for="inputTextArea">Input</label>
-						<textarea class="form-control" id="inputTextArea" rows="20"></textarea>
+						<textarea class="form-control" id="inputTextArea" rows="40"></textarea>
 					</div>
 				</form>
 			</div>

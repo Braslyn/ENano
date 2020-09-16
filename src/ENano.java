@@ -61,6 +61,18 @@ public class ENano extends NanoHTTPD{
 			case "/favicon.ico":
 				response = makeResponse("./web/favicon.ico",MIME_ICO);
 				break;
+			case "/codemirror/theme/cobalt.css":
+				response = makeResponse("./web/codemirror/theme/cobalt.css",MIME_CSS);
+				break;
+			case "/codemirror/lib/codemirror.js":
+				response = makeResponse("./web/codemirror/lib/codemirror.js",MIME_JS);
+				break;
+			case "/codemirror/mode/javascript/javascript.js":
+				response = makeResponse("./web/codemirror/mode/javascript/javascript.js",MIME_JS);
+				break;
+			case "/codemirror/lib/codemirror.css":
+				response = makeResponse("./web/codemirror/lib/codemirror.css",MIME_CSS);
+				break;
 			default:
 			response = makeResponse("./web/index.html",MIME_HTML);
 		}

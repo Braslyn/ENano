@@ -4,7 +4,7 @@ function init_app(){
 	var inputEditor = CodeMirror.fromTextArea
 	(document.getElementById('inputTextArea'), { 
 		lineNumbers: true,
-		theme: 'cobalt' 
+		theme: 'dracula' 
 	});
 	inputEditor.setSize(600, 500);
 

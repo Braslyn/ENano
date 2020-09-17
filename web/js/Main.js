@@ -1,3 +1,13 @@
+/*
+	Authors:
+		Enrique Mendez Cabezas
+		Braslyn Rodriguez Ramirez
+		Philippe Gairaud Quesada
+
+	Apis: 
+		https://codemirror.net/
+		https://github.com/eligrey/FileSaver.js/
+*/
 function init_app(){
 	$("#about").click(showAbout);
 	writeAuthors();

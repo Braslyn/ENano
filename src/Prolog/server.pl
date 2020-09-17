@@ -1,6 +1,6 @@
-%Autor Braslyn Rodriguez Ramirez
-%Autor Enrique Mendez Cabezas
-%Autor Phillipe Gairaud Quezada
+%Autor Braslyn Rodriguez Ramirez 402420750
+%Autor Enrique Mendez Cabezas 117390080
+%Autor Phillipe Gairaud Quezada 117290193
 :- use_module(library(http/http_parameters)).
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).

@@ -1,6 +1,6 @@
-%Autor Enrique Mendez Cabezas
-%Autor Braslyn Rodriguez Ramirez
-%Autor Philippe Gairaud Quesada
+%Autor Braslyn Rodriguez Ramirez 402420750
+%Autor Enrique Mendez Cabezas 117390080
+%Autor Phillipe Gairaud Quezada 117290193
 :- use_module(library(record)). 
 :- use_module(library(http/json)).
 :- use_module(library(http/json_convert)).

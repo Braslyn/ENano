@@ -11,7 +11,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Author : Braslyn Rodriguez Ramirez -- Braslynrrr999@gmail.com
+ * Author : 
+ 		Enrique Mendez Cabezas 117390080
+		Braslyn Rodriguez Ramirez 402420750
+		Philippe Gairaud Quesada 117290193
  */
  
 
@@ -61,7 +64,7 @@ public class ENano extends NanoHTTPD{
 			case "/favicon.ico":
 				response = makeResponse("./web/favicon.ico",MIME_ICO);
 				break;
-			case "/codemirror/theme/cobalt.css":
+			case "/codemirror/theme/dracula.css":
 				response = makeResponse("./web/codemirror/theme/dracula.css",MIME_CSS);
 				break;
 			case "/codemirror/lib/codemirror.js":
@@ -72,6 +75,9 @@ public class ENano extends NanoHTTPD{
 				break;
 			case "/codemirror/lib/codemirror.css":
 				response = makeResponse("./web/codemirror/lib/codemirror.css",MIME_CSS);
+				break;
+			case "/js/FileSaver.js":
+				response = makeResponse("./web/js/FileSaver.js",MIME_JS);
 				break;
 			default:
 			response = makeResponse("./web/index.html",MIME_HTML);

@@ -24,7 +24,7 @@ public class ENano extends NanoHTTPD{
 	final String MIME_CSS="text/css";
 	final String MIME_JS="text/javascript";
 	final String MIME_ICO="image/x-icon";
-	
+	final String root="./web";
 	Logger logger = Logger.getLogger(ENano.class.getName()); 
 	
 	public ENano(int port) throws IOException{
@@ -37,60 +37,18 @@ public class ENano extends NanoHTTPD{
     public Response serve(IHTTPSession session){
 		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
 		StringBuilder contentBuilder = new StringBuilder();
-		String origin="*";
-		/*var request_header= session.getHeaders();
-		
-		boolean cors_allowed= request_header!=null && 
-								"cors".equals(request_header.get("sec-fetch-mode"))&&
-								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0
-								&& (origin=request_header.get("origin"))!=null;
-		Response response= super.serve(session);
-		if (cors_allowed){
-			response.addHeader("Access-Control-Allow-Origin",origin);
-		}
-		*/
-		//response.addHeader("Content-Disposition: attachment; filename=", "./web/index.html");
-		Response response;
-		switch(session.getUri()){
-			case "/":
-				response = makeResponse("./web/index.html",MIME_HTML);
-				break;
-			case "/css/form.css":
-				response = makeResponse("./web/css/form.css",MIME_CSS);
-				break;
-			case "/js/Main.js":
-				response = makeResponse("./web/js/Main.js",MIME_JS);
-				break;
-			case "/favicon.ico":
-				response = makeResponse("./web/favicon.ico",MIME_ICO);
-				break;
-			case "/codemirror/theme/dracula.css":
-				response = makeResponse("./web/codemirror/theme/dracula.css",MIME_CSS);
-				break;
-			case "/codemirror/lib/codemirror.js":
-				response = makeResponse("./web/codemirror/lib/codemirror.js",MIME_JS);
-				break;
-			case "/codemirror/mode/javascript/javascript.js":
-				response = makeResponse("./web/codemirror/mode/javascript/javascript.js",MIME_JS);
-				break;
-			case "/codemirror/lib/codemirror.css":
-				response = makeResponse("./web/codemirror/lib/codemirror.css",MIME_CSS);
-				break;
-			case "/js/FileSaver.js":
-				response = makeResponse("./web/js/FileSaver.js",MIME_JS);
-				break;
-			default:
-			response = makeResponse("./web/index.html",MIME_HTML);
-		}
-		response.addHeader("Access-Control-Allow-Origin",origin);
+		String route=root+session.getUri();
+		Response response=makeResponse(route);
 		return response;
     }
-	private static Response makeResponse(String route,String type){
+	private static Response makeResponse(String route){
 		 try {
+			if(route.charAt(route.length()-1)=='/')
+				route+="index.html";
             Path path = Paths.get(route);
             Response resp = newFixedLengthResponse(
                     Response.Status.OK,
-                    type,
+                    getMIME(route),
                     Files.newInputStream(path),
                     Files.size(path)
             );
@@ -100,7 +58,20 @@ public class ENano extends NanoHTTPD{
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "ERROR");
         }
 	}
-	
+	private static String getMIME(String path){
+		String suffix = path.substring(path.lastIndexOf("."));
+        String mimeType = "text/html";
+        if (suffix.equalsIgnoreCase(".html") || suffix.equalsIgnoreCase(".htm")) {
+            mimeType = "text/html";
+        } else if (suffix.equalsIgnoreCase(".js")) {
+            mimeType = "text/javascript";
+        } else if (suffix.equalsIgnoreCase(".css")) {
+            mimeType = "text/css";
+        } else if (suffix.equalsIgnoreCase(".ico")) {
+            mimeType = "image/x-icon";
+        }
+        return mimeType;
+	}
 	public static void main(String[] args){
 		int port= args.length>0? Integer.parseInt(args[1]):5231;
 		try{

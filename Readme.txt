@@ -3,7 +3,7 @@ Autores:
 	Braslyn Rodriguez Ramirez
 	Philippe Gairaud Quesada
 Uso:
-	0-Abrir el cmd en la ruta donde se descomprimio. 
-	1-Construir el proyecto con el bat de build, solo requiere ser ejecutado una vez.
-	2-ejecutar run.bat para crear un run basico con puertos de 5231 para el servidor http y 3000 para prolog.
-	3-En el browser navegar en http://localhost:5231 (page) y http://localhost:3000/teste (Json desde Prolog).
+	1-Abrir el cmd en la ruta donde se descomprimio el archivo. 
+	2-Construir el proyecto con build.bat, solo requiere ser ejecutado una vez.
+	3-ejecutar run.bat para crear un run basico con puertos de 5231 para el servidor http y 3000 para prolog.
+	4-En el browser navegue a http://localhost:5231 (pagina principal) y http://localhost:3000/teste (Json desde Prolog).

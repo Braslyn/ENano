@@ -1,7 +1,6 @@
 import java.io.*;
 import java.util.*;
 import fi.iki.elonen.NanoHTTPD;
-import static fi.iki.elonen.NanoHTTPD.MIME_HTML;
 import static fi.iki.elonen.NanoHTTPD.Response;
 import java.util.logging.Level; 
 import java.util.logging.Logger;
@@ -20,10 +19,6 @@ import java.nio.file.Paths;
 
 public class ENano extends NanoHTTPD{
 	
-	
-	final String MIME_CSS="text/css";
-	final String MIME_JS="text/javascript";
-	final String MIME_ICO="image/x-icon";
 	final String root="./web";
 	Logger logger = Logger.getLogger(ENano.class.getName()); 
 	
@@ -32,7 +27,7 @@ public class ENano extends NanoHTTPD{
 		start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
 	}
 	
-	private final List<String> ALLOWED_SITES= Arrays.asList("same-site","same-origin");
+	//private final List<String> ALLOWED_SITES= Arrays.asList("same-site","same-origin");
     @Override
     public Response serve(IHTTPSession session){
 		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
@@ -48,7 +43,7 @@ public class ENano extends NanoHTTPD{
             Path path = Paths.get(route);
             Response resp = newFixedLengthResponse(
                     Response.Status.OK,
-                    getMIME(route),
+                    getMimeTypeForFile(route),
                     Files.newInputStream(path),
                     Files.size(path)
             );
@@ -58,20 +53,7 @@ public class ENano extends NanoHTTPD{
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "ERROR");
         }
 	}
-	private static String getMIME(String path){
-		String suffix = path.substring(path.lastIndexOf("."));
-        String mimeType = "text/html";
-        if (suffix.equalsIgnoreCase(".html") || suffix.equalsIgnoreCase(".htm")) {
-            mimeType = "text/html";
-        } else if (suffix.equalsIgnoreCase(".js")) {
-            mimeType = "text/javascript";
-        } else if (suffix.equalsIgnoreCase(".css")) {
-            mimeType = "text/css";
-        } else if (suffix.equalsIgnoreCase(".ico")) {
-            mimeType = "image/x-icon";
-        }
-        return mimeType;
-	}
+
 	public static void main(String[] args){
 		int port= args.length>0? Integer.parseInt(args[1]):5231;
 		try{

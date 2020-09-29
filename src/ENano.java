@@ -40,7 +40,7 @@ public class ENano extends RouterNanoHTTPD {
 		}
 	}
 	
-	static class AuthorsHandler extends DefaultHandler{
+	public static class AuthorsHandler extends DefaultHandler{
 		List<authors> auths= Arrays.asList(new authors(402420750,"Braslyn Rodriguez Ramirez"),
 		new authors(117290193,"Philippe Gairaud Quesada"),new authors(117390080,"Enrique Mendez Cabezas"));
 		@Override
@@ -52,7 +52,6 @@ public class ENano extends RouterNanoHTTPD {
         }
         @Override
         public String getMimeType() {
-            //return MIME_PLAINTEXT;
             return "application/json";
         }
      
@@ -62,24 +61,10 @@ public class ENano extends RouterNanoHTTPD {
         }
 		
 		@Override//devuelve el JSON con La info de Authors
-		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
-				String origin="*";
-				String text = getText();
-                ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
-				var request_header= session.getHeaders();
-				Response response= newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
-				//boolean cors_allowed= request_header!=null && 
-				//						"cors".equals(request_header.get("sec-fetch-mode"))&&
-				//						ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0
-				//						&& (origin=request_header.get("origin"))!=null;
-				//Response response= super.serve(session);
-				//if (cors_allowed){
-					response.addHeader("Access-Control-Allow-Origin",origin);
-				//}
-				
-				//response.addHeader("Content-Disposition: attachment; filename=", "./web/index.html");			
-
-            return response;
+		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
+            String text = getText();
+            ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+            return newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
         }
 	}
 	
@@ -128,7 +113,6 @@ public class ENano extends RouterNanoHTTPD {
 
     @Override
     public void addMappings() {
-		addRoute("/Home", PageHandler.class);
         addRoute("/authors", AuthorsHandler.class);
 		addRoute("/(?!(Home|authors)).*", PageHandler.class);
     }

@@ -22,7 +22,7 @@ function init_app(){
 }
 
 function writeAuthors(){
-	fetch('http://localhost:3000/teste')
+	fetch('http://localhost:5231/authors')
 	.then(resp=> resp.json()).then(json=> fillModal(json))
 	.catch(e => console.log(e));
 }

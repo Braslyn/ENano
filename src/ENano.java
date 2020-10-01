@@ -38,8 +38,12 @@ public class ENano extends RouterNanoHTTPD {
 		public String toString(){
 			return String.format("{\"ID\":%s,\"name\":\"%s\"}",id,name);
 		}
+    }
+    record info(int nrc,int group, String version, String repository){
+		public String toString(){
+			return String.format("[{\"NRC\":%s,\"group\":%s,\"version\":\"%s\",\"repository\":\"%s\"}]",nrc,group,version,repository);
+		}
 	}
-	
 	public static class AuthorsHandler extends DefaultHandler{
 		List<authors> auths= Arrays.asList(new authors(402420750,"Braslyn Rodriguez Ramirez"),
 		new authors(117290193,"Philippe Gairaud Quesada"),new authors(117390080,"Enrique Mendez Cabezas"));
@@ -61,6 +65,29 @@ public class ENano extends RouterNanoHTTPD {
         }
 		
 		@Override//devuelve el JSON con La info de Authors
+		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
+            String text = getText();
+            ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+            return newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+        }
+    }
+    public static class InfoHandler extends DefaultHandler{
+		info data = new info(50058,6,"1.1","https://github.com/Braslyn/ENano");
+		@Override
+        public String getText() {
+            return data.toString();
+        }
+        @Override
+        public String getMimeType() {
+            return "application/json";
+        }
+     
+        @Override
+        public Response.IStatus getStatus() {
+            return Response.Status.OK;
+        }
+		
+		@Override//devuelve el JSON con la info
 		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
             String text = getText();
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
@@ -114,6 +141,7 @@ public class ENano extends RouterNanoHTTPD {
     @Override
     public void addMappings() {
         addRoute("/authors", AuthorsHandler.class);
+        addRoute("/info", InfoHandler.class);
 		addRoute("/(?!(Home|authors)).*", PageHandler.class);
     }
     

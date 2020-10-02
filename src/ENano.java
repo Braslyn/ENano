@@ -41,7 +41,7 @@ public class ENano extends RouterNanoHTTPD {
     }
     record info(int nrc,int group, String version, String repository){
 		public String toString(){
-			return String.format("[{\"NRC\":%s,\"group\":%s,\"version\":\"%s\",\"repository\":\"%s\"}]",nrc,group,version,repository);
+			return String.format("{\"NRC\":%s,\"group\":%s,\"version\":\"%s\",\"repository\":\"%s\"}",nrc,group,version,repository);
 		}
 	}
 	public static class AuthorsHandler extends DefaultHandler{
@@ -49,10 +49,7 @@ public class ENano extends RouterNanoHTTPD {
 		new authors(117290193,"Philippe Gairaud Quesada"),new authors(117390080,"Enrique Mendez Cabezas"));
 		@Override
         public String getText() {
-            return auths.stream()
-                       .map(authors::toString)
-                       .collect(Collectors.joining(",", "[", "]"));
-            
+            return auths.stream().map(authors::toString).collect(Collectors.joining(",", "[", "]"));
         }
         @Override
         public String getMimeType() {
@@ -68,11 +65,14 @@ public class ENano extends RouterNanoHTTPD {
 		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
             String text = getText();
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
-            return newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+			Response response=newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+			response.addHeader("Access-Control-Allow-Origin","*");
+            return response;
         }
     }
     public static class InfoHandler extends DefaultHandler{
 		info data = new info(50058,6,"1.1","https://github.com/Braslyn/ENano");
+		
 		@Override
         public String getText() {
             return data.toString();
@@ -91,7 +91,9 @@ public class ENano extends RouterNanoHTTPD {
 		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
             String text = getText();
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
-            return newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+            response.addHeader("Access-Control-Allow-Origin","*");
+			return response;
         }
 	}
 	
@@ -133,7 +135,7 @@ public class ENano extends RouterNanoHTTPD {
         super(port);
         addMappings();
         start(SOCKET_READ_TIMEOUT, false);
-        System.out.format("*** Router running on port %d ***%n", port);
+        System.out.format("*** Server running on port %d ***%n", port);
     }
 	
 	
@@ -142,7 +144,7 @@ public class ENano extends RouterNanoHTTPD {
     public void addMappings() {
         addRoute("/authors", AuthorsHandler.class);
         addRoute("/info", InfoHandler.class);
-		addRoute("/(?!(Home|authors)).*", PageHandler.class);
+		addRoute("/(?!\s).*", PageHandler.class);
     }
     
     public static void main(String[] args ) throws IOException {

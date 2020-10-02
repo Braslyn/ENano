@@ -23,18 +23,25 @@ function init_app(){
 
 function writeAuthors(){
 	fetch('http://localhost:5231/authors')
-	.then(resp=> resp.json()).then(json=> fillModal(json))
+	.then(resp=> resp.json()).then(json=> fillAuthors(json))
 	.catch(e => console.log(e));
+		fetch('http://localhost:5231/info')
+	.then(resp=> resp.json()).then(json=> fillInfo(json))
+	.catch(e => console.log(e));
+	
 }
-function fillModal(json){
-	$("#author1").text(json.text[0]);
-	$("#author2").text(json.text[1]);
-	$("#author3").text(json.text[2]);
-	$("#nrc").text(json.text[3]);
-	$("#group").text(json.text[4]);
-	$("#version").text(json.text[5]);
-	$("#repositoryLink").attr("href",json.text[6]);
-	$("#date").text(json.text[7]);
+function fillInfo(json){
+	$("#nrc").text(json.NRC);
+	$("#group").text(json.group);
+	$("#version").text(json.version);
+	$("#repositoryLink").attr("href",json.repository);
+	$("#date").text("1/10/2020");
+}
+
+function fillAuthors(json){
+	$("#author1").text(json[0].name+" "+json[0].ID);
+	$("#author2").text(json[1].name+" "+json[1].ID);
+	$("#author3").text(json[0].name+" "+json[0].ID);
 }
 function saveCode(code){
 	var blob = new Blob([code], {type: "text/plain;charset=utf-8"});

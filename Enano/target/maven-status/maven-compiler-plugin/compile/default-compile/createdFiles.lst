@@ -1,4 +1,6 @@
+com\eif400\server\ENCompiler.class
 com\eif400\server\ENano$info.class
+com\eif400\server\ENCompiler$CompileHandler.class
 com\eif400\server\ENano$AuthorsHandler.class
 com\eif400\server\ENano$PageHandler.class
 com\eif400\server\ENano$authors.class

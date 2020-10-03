@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<!-- 
+	Authors:
+		Enrique Mendez Cabezas 117390080
+		Braslyn Rodriguez Ramirez 402420750
+		Philippe Gairaud Quesada 117290193
+
+	Apis: 
+		https://codemirror.net/
+		https://github.com/eligrey/FileSaver.js/
+		
+ -->
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="css/form.css">
+	<link rel="stylesheet" href="codemirror/theme/dracula.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.12/css/all.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+		integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+		crossorigin="anonymous"></script>
+	<script src="js/Main.js"></script>
+	<link rel="stylesheet" href="codemirror/lib/codemirror.css">
+	<script src="codemirror/lib/codemirror.js"></script>
+	<script src="codemirror/mode/javascript/javascript.js"></script>
+	<script src="js/FileSaver.js"></script>
+	<title>E-nano</title>
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+			aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link">E-nano</a>
+				</li>
+				<li class="navbar-nav">
+					<a class="nav-link" id="about">About</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+
+
+	<div class="col-sm-12">
+		<div class="row">
+			<div class="col-sm-1">
+				<div class="btn-group-vertical">
+					<label>Options</label>
+					<button type="button" class="btn btn-success" id='compileRun'>RUN
+						<i class="fas fa-play"></i>
+					</button>
+					<button type="button" class="btn btn-primary" id="saveCode">SAVE
+						<i class="fas fa-save"></i>
+					</button>
+					<button type="button" class="btn btn-warning" id ="clearInput">CLEAR
+						<i class="fas fa-eraser"></i>
+					</button>
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<form>
+					<div class="form-group">
+						<label for="inputTextArea">Input</label>
+						<textarea class="form-control" id="inputTextArea" rows="40"></textarea>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-4">
+				<form>
+					<div class="form-group">
+						<label for="outputTextArea">Output</label>
+						<textarea class="form-control" id="outputTextArea" rows="20"></textarea>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-1">
+				<div class="btn-group-vertical">
+					<label><br></label>
+					<button type="button" class="btn btn-warning" onclick ="clearOutput()">CLEAR
+						<i class="fas fa-eraser"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal" tabindex="-1" role="dialog" id="aboutModal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">About</h5>
+				</div>
+				<div class="modal-body" id="Modal">
+					<h5>Authors: </h5>
+					<p id="author1"></p>
+					<p id="author2"></p>
+					<p id="author3"></p>
+					<h5>NRC</h5>
+					<p id="nrc"></p>
+					<h5>Group</h5>
+					<p id="group"></p>
+					<h5>Version</h5>
+					<p id="version"></p>
+					<a href="" id="repositoryLink">Repository</a>
+
+					<h5 id="date"> <br></h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+		Group 06 E-nano 2020
+	</footer>
+</body>
+
+</html>

@@ -32,7 +32,7 @@
             </configuration>
         </plugin>
         <!-- This is just to make sure the class is set as main class to execute from the jar-->
-        <plugin>
+        <!-- <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
             <version>3.1.0</version>
@@ -54,7 +54,53 @@
                     </configuration>
                 </execution>
             </executions>
-        </plugin>
+        </plugin> -->
+
+        <plugin>
+              <artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>build-ENano</id>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>com.eif400.server.ENano</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<!-- <appendAssemblyId>false</appendAssemblyId> -->
+							<finalName>ENano</finalName>
+						</configuration>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>build-EnanoCompiler</id>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>com.eif400.server.ENCompiler</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<!-- <appendAssemblyId>false</appendAssemblyId> -->
+							<finalName>ENCompiler</finalName>
+						</configuration>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+
+				</executions>
+            </plugin>
+
     </plugins>
  </build>
 

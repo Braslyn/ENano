@@ -5,8 +5,15 @@ mvn clean verify
 
 ```
 #Comando Para ejecutarlo
+## Enano server
 ```bash
 
-java --enable-preview -jar target\Enano-1.0-SNAPSHOT.jar
+java --enable-preview -jar target\ENano-jar-with-dependencies.jar
+
+```
+## Enano Compiler server
+```bash
+
+java --enable-preview -jar target\ENCompiler-jar-with-dependencies.jar
 
 ```

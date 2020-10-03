@@ -19,16 +19,27 @@ function init_app(){
 	inputEditor.setSize(600, 500);
 	$("#clearInput").on("click", () => inputEditor.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
+	$("#compileRun").on("click", ()=> compile('http://localhost:9090/compile',inputEditor.getValue()));
 }
 
-function writeAuthors(){
-	fetch('http://localhost:5231/authors')
-	.then(resp=> resp.json()).then(json=> fillAuthors(json))
-	.catch(e => console.log(e));
-		fetch('http://localhost:5231/info')
-	.then(resp=> resp.json()).then(json=> fillInfo(json))
-	.catch(e => console.log(e));
-	
+async function compile(url,code){
+	//var file = new File([code], "Compile.java", {type: "text/plain;charset=utf-8"});
+	var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
+	var data = new FormData();
+	data.append("File", code);
+	const response= await fetch(url, {
+      method: 'POST',
+      body: blob
+    });
+	const json= await response.json();
+	$("#outputTextArea").val(json.result);
+}
+
+async function writeAuthors(){
+	const authors = await fetch('/authors');
+	fillAuthors(await authors.json());
+	const info = await fetch('/info');
+	fillInfo(await info.json())
 }
 function fillInfo(json){
 	$("#nrc").text(json.NRC);
@@ -45,7 +56,7 @@ function fillAuthors(json){
 }
 function saveCode(code){
 	var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
-	saveAs(blob, "code.txt");
+	saveAs(blob, "code.java");
 }
 
 function showAbout(){

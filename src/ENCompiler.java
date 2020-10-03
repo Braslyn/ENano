@@ -39,7 +39,13 @@ import javax.tools.*;
 public class ENCompiler extends RouterNanoHTTPD {
     static int PORT = 9090;
 	
+	
 	public static class CompileHandler extends DefaultHandler{
+		@Override
+        public String getText() {
+            return "";
+        }
+		
         @Override
         public String getMimeType() {
             return "application/json";
@@ -51,11 +57,10 @@ public class ENCompiler extends RouterNanoHTTPD {
         }
 		
 		@Override//Compila la clase de java
-		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
-            String text = getText();
+		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session){
+			String text=String.format("%s ***%n",urlParams);
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
-            response.addHeader("Access-Control-Allow-Origin","*");
 			return response;
         }
 	}
@@ -69,12 +74,28 @@ public class ENCompiler extends RouterNanoHTTPD {
 	
 	@Override
     public void addMappings() {
-        addRoute("/Compile", CompileHandler.class);
+        addRoute("/compile", CompileHandler.class);
     }
-    
+	
+	
+    List<String> ALLOWED_SITES= Arrays.asList("same-site","same-origin");
+	@Override
+	public Response serve(IHTTPSession session){
+		var request_header = session.getHeaders();
+		String origin="*";
+		boolean cors_allowed= request_header!=null && 
+								"cors".equals(request_header.get("sec-fetch-mode"))&&
+								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0
+								&& (origin=request_header.get("origin"))!=null;
+		Response response = super.serve(session);
+		if (cors_allowed){
+			response.addHeader("Access-Control-Allow-Origin",origin);
+		}		
+		return response;
+	}
     public static void main(String[] args ) throws IOException {
         PORT = args.length == 0 ? 9090 : Integer.parseInt(args[0]);
-        new ENano(PORT);
+        new ENCompiler(PORT);
     }
 	
 }

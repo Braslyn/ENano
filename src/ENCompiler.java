@@ -6,9 +6,12 @@
 */
 package com.eif400.server;
 
-import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.function.*;
 import java.util.stream.*;
 
@@ -68,18 +71,24 @@ public class ENCompiler extends RouterNanoHTTPD {
 		}catch(Exception e){
 			text="Fallo";
 		}
-		
-		//hay que encontrar el nombre de la clase
-		
-		
-		try{//se crea el archivo y se escribe en él.
-			file = new File("file");
+		String name="file";
+		try{
+			//hay que encontrar el nombre de la clase
+			
+			Pattern pattern = Pattern.compile("class (\\w+)\\{", Pattern.DOTALL);
+			Matcher matcher = pattern.matcher(text);
+			if(matcher.find()){
+				name = matcher.group(1);
+			}
+			
+		//se crea el archivo y se escribe en él.
+			file = new File(name+".java");
 			if (file.createNewFile()) {
-				FileWriter myWriter = new FileWriter("file");
+				FileWriter myWriter = new FileWriter(name+".java");
 				myWriter.write(text);
 				myWriter.close();
 			} else {
-				FileWriter myWriter = new FileWriter("file");
+				FileWriter myWriter = new FileWriter(name+".java");
 				myWriter.write(text);
 				myWriter.close();
 			}
@@ -116,8 +125,9 @@ public class ENCompiler extends RouterNanoHTTPD {
 		  System.exit(-1);
 		}
 		// Report diagnostics - adaptados para retonar json
+		text="";
 		if (diagsCollector.getDiagnostics().size() == 0){
-			text=String.format( "*** No errors found in %s ***%n",  file );
+			text=String.format( "*** No errors found in %s ***%n", file );
 			file.delete();
 			//------------------------------------------------------------
 			text=String.format("{\"result\":\"%s\"}",text);

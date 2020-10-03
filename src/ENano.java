@@ -32,7 +32,7 @@ import java.nio.file.Paths;
 
 public class ENano extends RouterNanoHTTPD {
     static int PORT = 5231;
-	
+	Logger logger = Logger.getLogger(ENano.class.getName()); 
 	
     record authors(int id,String name){
 		public String toString(){
@@ -46,8 +46,7 @@ public class ENano extends RouterNanoHTTPD {
 	}
 	public static class AuthorsHandler extends DefaultHandler{
 		List<authors> auths= Arrays.asList(new authors(402420750,"Braslyn Rodriguez Ramirez"),
-		new authors(117290193,"Philippe Gairaud Quesada"),new authors(117390080,"Enrique Mendez Cabezas"));
-		Logger logger = Logger.getLogger(AuthorsHandler.class.getName()); 
+		new authors(117290193,"Philippe Gairaud Quesada"),new authors(117390080,"Enrique Mendez Cabezas")); 
 		
 		@Override
         public String getText() {
@@ -66,7 +65,6 @@ public class ENano extends RouterNanoHTTPD {
 		@Override//devuelve el JSON con La info de Authors
 		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
             String text = getText();
-			logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response=newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			response.addHeader("Access-Control-Allow-Origin","*");
@@ -75,7 +73,6 @@ public class ENano extends RouterNanoHTTPD {
     }
     public static class InfoHandler extends DefaultHandler{
 		info data = new info(50058,6,"1.1","https://github.com/Braslyn/ENano");
-		Logger logger = Logger.getLogger(InfoHandler.class.getName()); 
 		@Override
         public String getText() {
             return data.toString();
@@ -93,7 +90,6 @@ public class ENano extends RouterNanoHTTPD {
 		@Override//devuelve el JSON con la info
 		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
             String text = getText();
-			logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
@@ -102,10 +98,8 @@ public class ENano extends RouterNanoHTTPD {
 	
     public static class PageHandler extends RouterNanoHTTPD.StaticPageHandler {
 		final String root="./web";
-		Logger logger = Logger.getLogger(ENano.class.getName()); 
         @Override
         public NanoHTTPD.Response get(RouterNanoHTTPD.UriResource uriResource, Map<String, String> urlParams, NanoHTTPD.IHTTPSession session) {
-			logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
 			StringBuilder contentBuilder = new StringBuilder();
 			String route=root+session.getUri();
 			Response response=makeResponse(route);
@@ -154,6 +148,7 @@ public class ENano extends RouterNanoHTTPD {
 	@Override
 	public Response serve(IHTTPSession session){
 		var request_header = session.getHeaders();
+		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
 		String origin="*";
 		boolean cors_allowed= request_header!=null && 
 								"cors".equals(request_header.get("sec-fetch-mode"))&&

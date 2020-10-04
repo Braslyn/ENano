@@ -32,7 +32,7 @@ import java.nio.file.Paths;
 
 public class ENano extends RouterNanoHTTPD {
     static int PORT = 5231;
-	
+	Logger logger = Logger.getLogger(ENano.class.getName()); 
 	
     record authors(int id,String name){
 		public String toString(){
@@ -46,7 +46,8 @@ public class ENano extends RouterNanoHTTPD {
 	}
 	public static class AuthorsHandler extends DefaultHandler{
 		List<authors> auths= Arrays.asList(new authors(402420750,"Braslyn Rodriguez Ramirez"),
-		new authors(117290193,"Philippe Gairaud Quesada"),new authors(117390080,"Enrique Mendez Cabezas"));
+		new authors(117290193,"Philippe Gairaud Quesada"),new authors(117390080,"Enrique Mendez Cabezas")); 
+		
 		@Override
         public String getText() {
             return auths.stream().map(authors::toString).collect(Collectors.joining(",", "[", "]"));
@@ -62,7 +63,7 @@ public class ENano extends RouterNanoHTTPD {
         }
 		
 		@Override//devuelve el JSON con La info de Authors
-		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
+		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
             String text = getText();
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response=newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
@@ -72,7 +73,6 @@ public class ENano extends RouterNanoHTTPD {
     }
     public static class InfoHandler extends DefaultHandler{
 		info data = new info(50058,6,"1.1","https://github.com/Braslyn/ENano");
-		
 		@Override
         public String getText() {
             return data.toString();
@@ -88,21 +88,18 @@ public class ENano extends RouterNanoHTTPD {
         }
 		
 		@Override//devuelve el JSON con la info
-		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
+		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
             String text = getText();
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
-            response.addHeader("Access-Control-Allow-Origin","*");
 			return response;
         }
 	}
 	
     public static class PageHandler extends RouterNanoHTTPD.StaticPageHandler {
 		final String root="./web";
-		Logger logger = Logger.getLogger(ENano.class.getName()); 
         @Override
         public NanoHTTPD.Response get(RouterNanoHTTPD.UriResource uriResource, Map<String, String> urlParams, NanoHTTPD.IHTTPSession session) {
-			logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
 			StringBuilder contentBuilder = new StringBuilder();
 			String route=root+session.getUri();
 			Response response=makeResponse(route);
@@ -146,7 +143,24 @@ public class ENano extends RouterNanoHTTPD {
         addRoute("/info", InfoHandler.class);
 		addRoute("/(?!\s).*", PageHandler.class);
     }
-    
+	
+    List<String> ALLOWED_SITES= Arrays.asList("same-site","same-origin");
+	@Override
+	public Response serve(IHTTPSession session){
+		var request_header = session.getHeaders();
+		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
+		String origin="*";
+		boolean cors_allowed= request_header!=null && 
+								"cors".equals(request_header.get("sec-fetch-mode"))&&
+								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0
+								&& (origin=request_header.get("origin"))!=null;
+		Response response= super.serve(session);
+		if (cors_allowed){
+			response.addHeader("Access-Control-Allow-Origin",origin);
+		}		
+		return response;
+	}
+	
     public static void main(String[] args ) throws IOException {
         PORT = args.length == 0 ? 5231 : Integer.parseInt(args[0]);
         new ENano(PORT);

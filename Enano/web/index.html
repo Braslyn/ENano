@@ -22,10 +22,9 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
 		integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
 		crossorigin="anonymous"></script>
-	<script src="js/Main.js"></script>
 	<link rel="stylesheet" href="codemirror/lib/codemirror.css">
 	<script src="codemirror/lib/codemirror.js"></script>
-	<script src="codemirror/mode/javascript/javascript.js"></script>
+	<script src="codemirror/mode/clike/clike.js"></script>
 	<script src="js/FileSaver.js"></script>
 	<title>E-nano</title>
 </head>
@@ -95,9 +94,11 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
+				
 					<h5 class="modal-title">About</h5>
 				</div>
 				<div class="modal-body" id="Modal">
+					<center>
 					<h5>Authors: </h5>
 					<p id="author1"></p>
 					<p id="author2"></p>
@@ -109,8 +110,8 @@
 					<h5>Version</h5>
 					<p id="version"></p>
 					<a href="" id="repositoryLink">Repository</a>
-
 					<h5 id="date"> <br></h5>
+					</center>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -118,7 +119,7 @@
 			</div>
 		</div>
 	</div>
-
+	<script src="js/Main.js"></script>
 	<footer>
 		Group 06 E-nano 2020
 	</footer>

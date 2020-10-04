@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.*;
 import java.util.stream.*;
+import java.util.Properties;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.router.RouterNanoHTTPD;
@@ -184,8 +185,17 @@ public class ENCompiler extends RouterNanoHTTPD {
 	
 	
     public static void main(String[] args ) throws IOException {
-        PORT = args.length == 0 ? 9090 : Integer.parseInt(args[0]);
-        new ENCompiler(PORT);
+		String PORT;
+		try{
+		InputStream inputStream= new FileInputStream(new File("./web/properties/Ecompiler.properties"));
+		Properties prop = new Properties();
+		prop.load(inputStream);
+		PORT = prop.getProperty("port");
+        }catch(Exception e){
+			System.out.format("Archivo /properties/Ecompiler.properties %s",e.getMessage());
+			PORT="9090";
+		}
+        new ENCompiler(Integer.parseInt(PORT));
     }
 	
 }

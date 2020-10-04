@@ -14,7 +14,8 @@ function init_app(){
 	var inputEditor = CodeMirror.fromTextArea
 	(document.getElementById('inputTextArea'), { 
 		lineNumbers: true,
-		theme: 'dracula' 
+		theme: 'dracula',
+		mode:"text/x-java"
 	});
 	inputEditor.setSize(600, 500);
 	$("#clearInput").on("click", () => inputEditor.setValue(""));
@@ -23,15 +24,13 @@ function init_app(){
 }
 
 async function compile(url,code){
-	//var file = new File([code], "Compile.java", {type: "text/plain;charset=utf-8"});
-	var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
-	var data = new FormData();
-	data.append("File", code);
-	const response= await fetch(url, {
-      method: 'POST',
-      body: blob
+	const response= await fetch(url,{
+      "method": 'POST',
+	  "Content-Type": "text/plain;charset=utf-8",
+      body: code
     });
 	const json= await response.json();
+	
 	$("#outputTextArea").val(json.result);
 }
 

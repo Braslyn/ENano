@@ -130,22 +130,23 @@ public class ENCompiler extends RouterNanoHTTPD {
 			text=String.format( "*** No errors found in %s ***", file );
 			file.delete();
 			//------------------------------------------------------------
-			text=String.format("{\"result\":\"%s\"}",text);
+			text=String.format("{\"result\":\" %s \"}",text);
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
 		}
+		StringBuilder teste = new StringBuilder();
 		for( var d: diagsCollector.getDiagnostics() ) {
 			long pos = d.getLineNumber();
 			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
-			text+=String.format("%s %s in source '%s' \\n",
+			teste.append(String.format("%s %s in source %s \\n",
 				location, 
-				d.getMessage( locale ),
-				d.getSource().getName());
+				d.getMessage( Locale.ENGLISH ).replace("\n", "\\n"),
+				d.getSource().getName()));
 		}	
 			file.delete();
 			//------------------------------------------------------------
-			text=String.format("{\"result\":\"%s\"}",text);
+			text=String.format("{\"result\":\" %s \"}",teste.toString());
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;

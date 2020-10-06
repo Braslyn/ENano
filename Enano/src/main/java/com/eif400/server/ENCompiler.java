@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.*;
 import java.util.stream.*;
+import java.util.Properties;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.router.RouterNanoHTTPD;
@@ -130,23 +131,22 @@ public class ENCompiler extends RouterNanoHTTPD {
 			text=String.format( "*** No errors found in %s ***", file );
 			file.delete();
 			//------------------------------------------------------------
-			text=String.format("{\"result\":\" %s \"}",text);
+			text=String.format("{\"result\":\"%s\"}",text);
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
 		}
-		StringBuilder teste = new StringBuilder();
 		for( var d: diagsCollector.getDiagnostics() ) {
 			long pos = d.getLineNumber();
 			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
-			teste.append(String.format("%s %s in source %s \\n",
+			text+=String.format("%s %s in source '%s' \\n",
 				location, 
-				d.getMessage( Locale.ENGLISH ).replace("\n", "\\n"),
-				d.getSource().getName()));
+				d.getMessage( locale.ENGLISH ).replaceAll("\n","\\n"),
+				d.getSource().getName());
 		}	
 			file.delete();
 			//------------------------------------------------------------
-			text=String.format("{\"result\":\" %s \"}",teste.toString());
+			text=String.format("{\"result\":\"%s\"}",text);
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
@@ -170,23 +170,33 @@ public class ENCompiler extends RouterNanoHTTPD {
 	@Override
 	public Response serve(IHTTPSession session){
 		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
-		var request_header = session.getHeaders();
 		String origin="*";
-		boolean cors_allowed= request_header!=null && 
+		/*boolean cors_allowed= request_header!=null && 
 								"cors".equals(request_header.get("sec-fetch-mode"))&&
 								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0
 								&& (origin=request_header.get("origin"))!=null;
 		Response response = super.serve(session);
 		//if (cors_allowed){
 			response.addHeader("Access-Control-Allow-Origin",origin);
-		//}
+		//}*/
+		Response response = super.serve(session);
+		response.addHeader("Access-Control-Allow-Origin",origin);
 		return response;
 	}
 	
 	
     public static void main(String[] args ) throws IOException {
-        PORT = args.length == 0 ? 9090 : Integer.parseInt(args[0]);
-        new ENCompiler(PORT);
+		String PORT;
+		try{
+		InputStream inputStream= new FileInputStream(new File("./web/properties/Ecompiler.properties"));
+		Properties prop = new Properties();
+		prop.load(inputStream);
+		PORT = prop.getProperty("port");
+        }catch(Exception e){
+			System.out.format("Archivo /properties/Ecompiler.properties %s",e.getMessage());
+			PORT="9090";
+		}
+        new ENCompiler(Integer.parseInt(PORT));
     }
 	
 }

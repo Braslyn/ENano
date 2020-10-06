@@ -141,7 +141,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
 			text+=String.format("%s %s in source '%s' \\n",
 				location, 
-				d.getMessage( locale ),
+				d.getMessage( locale.ENGLISH ).replaceAll("\n","\\n"),
 				d.getSource().getName());
 		}	
 			file.delete();
@@ -170,16 +170,17 @@ public class ENCompiler extends RouterNanoHTTPD {
 	@Override
 	public Response serve(IHTTPSession session){
 		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
-		var request_header = session.getHeaders();
 		String origin="*";
-		boolean cors_allowed= request_header!=null && 
+		/*boolean cors_allowed= request_header!=null && 
 								"cors".equals(request_header.get("sec-fetch-mode"))&&
 								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0
 								&& (origin=request_header.get("origin"))!=null;
 		Response response = super.serve(session);
 		//if (cors_allowed){
 			response.addHeader("Access-Control-Allow-Origin",origin);
-		//}
+		//}*/
+		Response response = super.serve(session);
+		response.addHeader("Access-Control-Allow-Origin",origin);
 		return response;
 	}
 	

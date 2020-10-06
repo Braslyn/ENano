@@ -11,6 +11,7 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
+import java.util.Properties;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.router.RouterNanoHTTPD;
@@ -29,6 +30,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+
 
 public class ENano extends RouterNanoHTTPD {
     static int PORT = 5231;
@@ -162,7 +165,16 @@ public class ENano extends RouterNanoHTTPD {
 	}
 	
     public static void main(String[] args ) throws IOException {
-        PORT = args.length == 0 ? 5231 : Integer.parseInt(args[0]);
-        new ENano(PORT);
+		String PORT;
+		try{
+        InputStream inputStream= new FileInputStream(new File("./web/properties/Enano.properties"));
+		Properties prop = new Properties();
+		prop.load(inputStream);
+		PORT = prop.getProperty("port");
+		}catch(Exception e){
+			System.out.format("Archivo /properties/Enano.properties %s",e.getMessage());
+			PORT="8080";
+		}
+        new ENano(Integer.parseInt(PORT));
     }
 }

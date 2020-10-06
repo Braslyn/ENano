@@ -24,14 +24,15 @@ function init_app(){
 }
 
 async function compile(url,code){
+	$("#compileRun").prop("disabled",true);
 	const response= await fetch(url,{
       "method": 'POST',
 	  "Content-Type": "text/plain;charset=utf-8",
       body: code
     });
 	const json= await response.json();
-	
 	$("#outputTextArea").val(json.result);
+	$("#compileRun").prop("disabled",false);
 }
 
 async function writeAuthors(){

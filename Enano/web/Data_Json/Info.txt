@@ -1,0 +1,6 @@
+project: Enano
+course: EIF400
+instance: NRC50058
+cycle: II-2020
+organization: UNA
+projectSite: http://titano.tech:5231/

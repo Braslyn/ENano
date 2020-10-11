@@ -72,7 +72,9 @@ public class ENCompiler extends RouterNanoHTTPD {
 		}catch(Exception e){
 			text="Fallo";
 		}
+		
 		String name="file";
+		
 		try{
 			//hay que encontrar el nombre de la clase
 			

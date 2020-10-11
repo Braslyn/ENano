@@ -17,7 +17,7 @@ function init_app(){
 		theme: 'dracula',
 		mode:"text/x-java"
 	});
-	inputEditor.setSize(600, 500);
+	inputEditor.setSize(600, 450);
 	var evaluator = CodeMirror.fromTextArea
 	(document.getElementById('evaluatorTextArea'), { 
 		lineNumbers: true,

@@ -18,6 +18,13 @@ function init_app(){
 		mode:"text/x-java"
 	});
 	inputEditor.setSize(600, 500);
+	var evaluator = CodeMirror.fromTextArea
+	(document.getElementById('evaluatorTextArea'), { 
+		lineNumbers: true,
+		theme: 'dracula',
+		mode:"text/x-java"
+	});
+	evaluator.setSize(600, 300);
 	$("#clearInput").on("click", () => inputEditor.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
 	$("#compileRun").on("click", ()=> compile('http://localhost:9090/compile',inputEditor.getValue()));

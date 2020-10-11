@@ -10,7 +10,7 @@
 */
 function init_app(){
 	$("#about").click(showAbout);
-	writeAuthors();
+	
 	var inputEditor = CodeMirror.fromTextArea
 	(document.getElementById('inputTextArea'), { 
 		lineNumbers: true,
@@ -43,23 +43,28 @@ async function compile(url,code){
 }
 
 async function writeAuthors(){
-	const authors = await fetch('/authors');
-	fillAuthors(await authors.json());
+	//const authors = await fetch('/authors');
+	//fillAuthors(await authors.json());
 	const info = await fetch('/info');
 	fillInfo(await info.json())
 }
 function fillInfo(json){
-	$("#nrc").text(json.NRC);
-	$("#group").text(json.group);
-	$("#version").text(json.version);
-	$("#repositoryLink").attr("href",json.repository);
+	const {team: team, nrc: nrc, version: version
+		, projectSite: projectSite, repository:repository } = json; 
+	$("#nrc").text(nrc);
+	$("#group").text(team.code);
+	$("#version").text(version);
+	$("#repositoryLink").attr("href",repository);
+	$("#site").attr("href",site);
 	$("#date").text("1/10/2020");
+	fillAuthors(team);
 }
 
-function fillAuthors(json){
-	$("#author1").text(json[0].name+" "+json[0].ID);
-	$("#author2").text(json[1].name+" "+json[1].ID);
-	$("#author3").text(json[0].name+" "+json[0].ID);
+function fillAuthors(team){
+	const {members: members} = team; 
+	$("#author1").text(members[0].Name+" "+members[0].Surnames+ " "+members[0].id);
+	$("#author2").text(members[1].Name+" "+members[1].Surnames+ " "+members[1].id);
+	$("#author3").text(members[2].Name+" "+members[2].Surnames+ " "+members[2].id);
 }
 function saveCode(code){
 	var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
@@ -67,6 +72,7 @@ function saveCode(code){
 }
 
 function showAbout(){
+	writeAuthors();
 	$("#aboutModal").modal('show');
 }
 function clearOutput(){

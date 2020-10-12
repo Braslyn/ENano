@@ -188,7 +188,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	
 	
     public static void main(String[] args ) throws IOException {
-		String PORT;
+		String PORT=null;
 		try{
 		InputStream inputStream= new FileInputStream(new File("./web/properties/Ecompiler.properties"));
 		Properties prop = new Properties();
@@ -196,8 +196,10 @@ public class ENCompiler extends RouterNanoHTTPD {
 		PORT = prop.getProperty("port");
         }catch(Exception e){
 			System.out.format("Archivo /properties/Ecompiler.properties %s",e.getMessage());
-			PORT="9090";
+			
 		}
+		if(PORT==null)
+			PORT="9090";
         new ENCompiler(Integer.parseInt(PORT));
     }
 	

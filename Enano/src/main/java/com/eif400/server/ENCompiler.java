@@ -130,7 +130,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 		// Report diagnostics - adaptados para retonar json
 		text="";
 		if (diagsCollector.getDiagnostics().size() == 0){
-			text=String.format( "*** No errors found in %s ***", file );
+			text="*** No errors found ***";
 			file.delete();
 			//------------------------------------------------------------
 			text=String.format("{\"result\":\"%s\"}",text);
@@ -141,10 +141,9 @@ public class ENCompiler extends RouterNanoHTTPD {
 		for( var d: diagsCollector.getDiagnostics() ) {
 			long pos = d.getLineNumber();
 			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
-			text+=String.format("%s %s in source '%s' \\n",
+			text+=String.format("%s %s \\n",
 				location, 
-				d.getMessage( locale.ENGLISH ).replaceAll("\n","\\n"),
-				d.getSource().getName());
+				d.getMessage( locale.ENGLISH ).replaceAll("\n"," "));
 		}	
 			file.delete();
 			//------------------------------------------------------------

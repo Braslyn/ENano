@@ -141,7 +141,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 		for( var d: diagsCollector.getDiagnostics() ) {
 			long pos = d.getLineNumber();
 			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
-			text+=String.format("%s %s in source \\n",
+			text+=String.format("%s %s \\n",
 				location, 
 				d.getMessage( locale.ENGLISH ).replaceAll("\n"," "));
 		}	

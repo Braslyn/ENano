@@ -29,6 +29,7 @@ function init_app(){
 	$("#confirmClear").on("click", () => inputEditor.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
 	$("#compileRun").on("click", ()=> compile('http://localhost:9090/compile',inputEditor.getValue()));
+	$("#outputTextArea").val('');
 }
 
 async function compile(url,code){

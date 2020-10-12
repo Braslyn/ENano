@@ -25,7 +25,8 @@ function init_app(){
 		mode:"text/x-java"
 	});
 	evaluator.setSize(600, 300);
-	$("#clearInput").on("click", () => inputEditor.setValue(""));
+	$("#clearInput").on("click", () => $("#confirmationModal").modal('show'));
+	$("#confirmClear").on("click", () => inputEditor.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
 	$("#compileRun").on("click", ()=> compile('http://localhost:9090/compile',inputEditor.getValue()));
 }
@@ -74,6 +75,9 @@ function saveCode(code){
 function showAbout(){
 	writeAuthors();
 	$("#aboutModal").modal('show');
+}
+function clearInput(){
+	$("#outputTextArea").val('');
 }
 function clearOutput(){
 	$("#outputTextArea").val('');

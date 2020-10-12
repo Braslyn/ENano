@@ -55,7 +55,7 @@ function fillInfo(json){
 	$("#group").text(team.code);
 	$("#version").text(version);
 	$("#repositoryLink").attr("href",repository);
-	$("#site").attr("href",site);
+	$("#site").attr("href",projectSite);
 	$("#date").text("1/10/2020");
 	fillAuthors(team);
 }

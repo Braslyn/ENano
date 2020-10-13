@@ -51,7 +51,7 @@ async function compile(url,code){
 async function writeAuthors(){
 	//const authors = await fetch('/authors');
 	//fillAuthors(await authors.json());
-	const info = await fetch('http://localhost:9090/compile/info');
+	const info = await fetch('http://localhost:9090/info');
 	fillInfo(await info.json())
 }
 function fillInfo(json){

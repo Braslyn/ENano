@@ -234,6 +234,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	public Response serve(IHTTPSession session){
 		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
 		String origin="*";
+		System.out.println(session.getHeaders().get("origin"));
 		/*boolean cors_allowed= request_header!=null && 
 								"cors".equals(request_header.get("sec-fetch-mode"))&&
 								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0

@@ -99,7 +99,7 @@ public class ENano extends RouterNanoHTTPD {
 		Response response= super.serve(session);
 		if (cors_allowed){
 			response.addHeader("Access-Control-Allow-Origin",origin);
-		}		
+		}
 		return response;
 	}
 	

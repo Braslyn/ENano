@@ -54,9 +54,7 @@ async function writeAuthors(){
 	const info = await fetch('http://localhost:9090/info');
 	fillInfo(await info.json())
 }
-function fillInfo(json){
-	const {team: team, nrc: nrc, version: version
-		, projectSite: projectSite, repository:repository } = json; 
+function fillInfo({team,nrc,version,projectSite,repository}){
 	$("#nrc").text(nrc);
 	$("#group").text(team.code);
 	$("#version").text(version);
@@ -66,11 +64,9 @@ function fillInfo(json){
 	fillAuthors(team);
 }
 
-function fillAuthors(team){
-	const {members: members} = team; 
-	$("#author1").text(members[0].Name+" "+members[0].Surnames+ " "+members[0].id);
-	$("#author2").text(members[1].Name+" "+members[1].Surnames+ " "+members[1].id);
-	$("#author3").text(members[2].Name+" "+members[2].Surnames+ " "+members[2].id);
+function fillAuthors({members}){
+	let index=1;
+	members.forEach( (member)=> $("#author"+index++).text(member.Name+" "+member.Surnames+" "+member.id) )
 }
 function saveCode(code){
 	var blob = new Blob([code], {type: "text/plain;charset=utf-8"});

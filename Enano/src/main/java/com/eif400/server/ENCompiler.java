@@ -3,6 +3,10 @@
 		Enrique Mendez Cabezas 117390080
 		Braslyn Rodriguez Ramirez 402420750
 		Philippe Gairaud Quesada 117290193
+		
+	Basado en la clase compilador de Carlos Loria Saenz
+	@author loriacarlos@gmail.com
+	JavaAPICompiler
 */
 package com.eif400.server;
 
@@ -44,6 +48,63 @@ public class ENCompiler extends RouterNanoHTTPD {
     static int PORT = 9090;
 	Logger logger = Logger.getLogger(ENCompiler.class.getName());
 	
+	public static class InfoHandler extends DefaultHandler{
+		final Pattern Getline = Pattern.compile("(\\w+): ([a-zA-Z| -.:\\/|[0-9]+]*)");
+		String text;
+		@Override
+        public String getText() {
+            return text;
+        }
+        @Override
+        public String getMimeType() {
+            return "application/json";
+        }
+     
+        @Override
+        public Response.IStatus getStatus() {
+            return Response.Status.OK;
+        }
+		private String Json(Matcher matcher){
+			matcher.find();
+			return String.format("\"%s\":\"%s\"",matcher.group(1),matcher.group(2));	
+		}
+			
+		@Override//devuelve el JSON con la info
+		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
+            //Lee del archivo
+			try{
+				var Data= Files.lines(Paths.get("./web/Data_Json/Info.txt")).collect(Collectors.toList());
+				text = Data.stream().reduce("{",(x,y)-> x+Json(Getline.matcher(y))+",");
+				Data = Files.lines(Paths.get("./web/Data_Json/Authors.txt")).collect(Collectors.toList());
+				Data = Data.stream().map(line -> Getline.matcher(line) ).map( match -> Json(match) ).collect(Collectors.toList());
+				String team=String.format("\"team\":{%s,\"members\":[",Data.get(0));
+				
+				for(int i=1;i<Data.size();i++){
+					switch((i-1)%3){
+					case 0:
+						team+="{"+Data.get(i)+",";
+						break;
+					case 1:
+						team+=Data.get(i)+",";
+						break;
+					case 2:
+						team+= i+1==Data.size()? Data.get(i)+"}":Data.get(i)+"},";
+						break;
+					}
+				}
+				team+="]}";
+				text+=text.format(team);
+			}catch(Exception ex){
+				text="{\"result\":\""+ex.getMessage()+"\"";
+			}
+			text+="}";
+			//Posible Cliente de DB
+            ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+			return response;
+        }
+	}
+	
 	public static class CompileHandler extends DefaultHandler{
 		String text;
 		@Override
@@ -78,7 +139,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 		try{
 			//hay que encontrar el nombre de la clase
 			
-			Pattern pattern = Pattern.compile("public class (\\w+) ((\\w+)| )*\\{");
+			Pattern pattern = Pattern.compile("class (\\w+) ((\\w+)| )*\\{");
 			Matcher matcher = pattern.matcher(text);
 			if(matcher.find()){
 				name = matcher.group(1);
@@ -138,7 +199,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
 		}
-		for( var d: diagsCollector.getDiagnostics() ) {
+		for( var d: diagsCollector.getDiagnostics() ) {//usar bufffers
 			long pos = d.getLineNumber();
 			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
 			text+=String.format("%s %s \\n",
@@ -164,6 +225,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	@Override
     public void addMappings() {
         addRoute("/compile", CompileHandler.class);
+		addRoute("/info", InfoHandler.class);
     }
 	
 	

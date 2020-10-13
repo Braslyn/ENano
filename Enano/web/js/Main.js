@@ -33,21 +33,25 @@ function init_app(){
 }
 
 async function compile(url,code){
-	$("#compileRun").prop("disabled",true);
-	const response= await fetch(url,{
-      "method": 'POST',
-	  "Content-Type": "text/plain;charset=utf-8",
-      body: code
-    });
-	const json= await response.json();
-	$("#outputTextArea").val(json.result);
-	$("#compileRun").prop("disabled",false);
+	if(code!==""){
+		$("#compileRun").prop("disabled",true);
+		const response= await fetch(url,{
+		  "method": 'POST',
+		  "Content-Type": "text/plain;charset=utf-8",
+		  body: code
+		});
+		const json= await response.json();
+		$("#outputTextArea").val(json.result);
+		$("#compileRun").prop("disabled",false);
+	}else{
+		$("#outputTextArea").val("Text something");
+	}
 }
 
 async function writeAuthors(){
 	//const authors = await fetch('/authors');
 	//fillAuthors(await authors.json());
-	const info = await fetch('/info');
+	const info = await fetch('http://localhost:9090/compile/info');
 	fillInfo(await info.json())
 }
 function fillInfo(json){

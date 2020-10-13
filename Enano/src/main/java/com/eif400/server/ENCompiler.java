@@ -78,7 +78,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 		try{
 			//hay que encontrar el nombre de la clase
 			
-			Pattern pattern = Pattern.compile("class (\\w+)\\{", Pattern.DOTALL);
+			Pattern pattern = Pattern.compile("public class (\\w+) ((\\w+)| )*\\{");
 			Matcher matcher = pattern.matcher(text);
 			if(matcher.find()){
 				name = matcher.group(1);

@@ -45,7 +45,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	Logger logger = Logger.getLogger(ENCompiler.class.getName());
 	
 	public static class CompileHandler extends DefaultHandler{
-		String text;
+		static String text;
 		@Override
         public String getText() {
             return text;
@@ -138,14 +138,10 @@ public class ENCompiler extends RouterNanoHTTPD {
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
 		}
-		for( var d: diagsCollector.getDiagnostics() ) {
-			long pos = d.getLineNumber();
-			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
-			text+=String.format("%s %s in source '%s' \\n",
-				location, 
-				d.getMessage( locale.ENGLISH ).replaceAll("\n","\\n"),
-				d.getSource().getName());
-		}	
+			var texto=diagsCollector.getDiagnostics().stream().
+								reduce(new StringBuffer("{\"result\": \""),(stbff,line)->stbff.append("Line: "+line.getLineNumber()+" "+line.getMessage( locale.ENGLISH ).replaceAll("\n"," ")),(x,y)-> x);	
+			file.delete();
+			text=texto.append("\"}").toString();
 			file.delete();
 			//------------------------------------------------------------
 			text=String.format("{\"result\":\"%s\"}",text);

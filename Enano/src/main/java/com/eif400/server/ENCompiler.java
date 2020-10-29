@@ -199,19 +199,14 @@ public class ENCompiler extends RouterNanoHTTPD {
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
 		}
-		for( var d: diagsCollector.getDiagnostics() ) {//usar bufffers
-			long pos = d.getLineNumber();
-			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
-			text+=String.format("%s %s \\n",
-				location, 
-				d.getMessage( locale.ENGLISH ).replaceAll("\n"," "));
-		}	
-			file.delete();
-			//------------------------------------------------------------
-			text=String.format("{\"result\":\"%s\"}",text);
-            ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
-			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
-			return response;
+		var texto=diagsCollector.getDiagnostics().stream().
+								reduce(new StringBuffer(),(stbff,line)=> stbff.append("Line: "+line.getLineNumber()+
+								stbff.append(d.getMessage( locale.ENGLISH ).replaceAll("\n"," "))));	
+		file.delete();
+		//------------------------------------------------------------
+		ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+		Response response = newFixedLengthResponse(getStatus(), getMimeType(), texto, texto.getBytes().length);
+		return response;
         }
 	}
 	

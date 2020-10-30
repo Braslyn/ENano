@@ -34,11 +34,13 @@ function init_app(){
 
 async function compile(url,code){
 	if(code!==""){
+		let formData = new FormData()
+		await formData.append('text',code);
 		$("#compileRun").prop("disabled",true);
 		const response= await fetch(url,{
 		  "method": 'POST',
-		  "Content-Type": "text/plain;charset=utf-8",
-		  body: code
+		  'Content-Type': 'multipart/form-data',
+		  body: formData
 		});
 		const json= await response.json();
 		$("#outputTextArea").val(json.result);

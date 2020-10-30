@@ -15,9 +15,10 @@ since: 2020
 :- use_module(library(http/http_parameters)).
 :- use_module(library(http/http_cors)).
 :- use_module(library(http/http_client)).
+:- use_module(library(http/http_json)).
 
 :- initialization
-    (current_prolog_flag(argv, [SPort | _]) -> true ; SPort='8080'),
+    (current_prolog_flag(argv, [SPort | _]) -> true ; SPort='3030'),
     atom_number(SPort, Port),
     format('*** Serving on port ~d *** ~n', [Port]),
     % Logging
@@ -27,5 +28,18 @@ since: 2020
     server(Port).
 	
 	
-:- http_handler('/Transpile', transpile_handler, []). 
-	
+server(Port) :-                                            % (2)
+http_server(http_dispatch, [port(Port)]).
+
+:- http_handler('/transpile', transpile_handler ,[method(post)]). 
+
+
+transpile_handler(Request) :- cors_enable,
+http_parameters(Request,[text(Text)],
+         [attribute_declarations(param), 'application/x-www-form-urlencoded; charset=UTF-8']
+        ),dict(Text,Reply),reply_json_dict(Reply).
+
+
+dict(Text,_{result:Text}).
+
+param(text, [optional(true)]).

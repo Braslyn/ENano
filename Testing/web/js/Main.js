@@ -27,15 +27,17 @@ function init_app(){
 	evaluator.setSize(600, 300);
 	$("#clearInput").on("click", () => inputEditor.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
-	$("#compileRun").on("click", ()=> compile('http://localhost:9090/compile',inputEditor.getValue()));
+	$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
 }
 
 async function compile(url,code){
+	let formdata = new FormData();
+	await formdata.append('text',code);
 	$("#compileRun").prop("disabled",true);
 	const response= await fetch(url,{
       "method": 'POST',
 	  "Content-Type": "text/plain;charset=utf-8",
-      body: code
+      body: formdata
     });
 	const json= await response.json();
 	$("#outputTextArea").val(json.result);

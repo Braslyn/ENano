@@ -144,7 +144,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 			text=texto.append("\"}").toString();
 			file.delete();
 			//------------------------------------------------------------
-			text=String.format("{\"result\":\"%s\"}",text);
+			//text=String.format("{\"result\":\"%s\"}",text);
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;

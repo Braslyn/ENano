@@ -37,8 +37,15 @@ http_server(http_dispatch, [port(Port)]).
 transpile_handler(Request) :- cors_enable,
 http_parameters(Request,[text(Text)],
          [attribute_declarations(param), 'application/x-www-form-urlencoded; charset=UTF-8']
-        ),dict(Text,Reply),reply_json_dict(Reply).
+        ),post(Text,Json),reply_json(Json).
 
+
+
+post(Text,Reply) :-
+        http_post('http://localhost:9090/compile', 
+                  atom('text/plain;charset=utf-8', Text), 
+                  Reply,
+                  [method(post)]). 
 
 dict(Text,_{result:Text}).
 

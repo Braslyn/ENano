@@ -8,5 +8,5 @@ set WEBSOCKET=lib\nanohttpd-websocket-2.3.1.jar
 
 set CLASSPATH=%NANO%;%SERVLET%;%NANOLETS%;%WEBSERVER%;%WEBSOCKET%
 
-javac -d classes  --enable-preview --release 14 -cp %CLASSPATH%;classes src\*.java
+javac -d classes  --enable-preview --release 14 -cp %CLASSPATH%;classes src\java\*.java
 

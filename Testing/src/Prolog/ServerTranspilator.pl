@@ -16,6 +16,9 @@ since: 2020
 :- use_module(library(http/http_cors)).
 :- use_module(library(http/http_client)).
 :- use_module(library(http/http_json)).
+:- use_module('./NanoParser/parser', [parseNanoFile/2 as parse
+                 ]).
+
 
 :- initialization
     (current_prolog_flag(argv, [SPort | _]) -> true ; SPort='3030'),
@@ -41,12 +44,17 @@ http_parameters(Request,[text(Text)],
 
 
 
-post(Text,Reply) :-
+post(Text,Reply) :- save_text('./private/File.no', Text),
+        parse('./private/File.no',Result),write(Result),
         http_post('http://localhost:9090/compile', 
                   atom('text/plain;charset=utf-8', Text), 
                   Reply,
                   [method(post)]). 
 
-dict(Text,_{result:Text}).
 
 param(text, [optional(true)]).
+
+save_text(Path, Text) :-
+    open(Path, write, S),
+    write(S, Text),
+    close(S).

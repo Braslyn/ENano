@@ -14,24 +14,34 @@
                       tokenize_atom/2
 ]).
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Entry Point %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 parseNanoFile(File, Tree) :-
    tokenize(File, Tokens),
-   parseNanoTokens(Tokens, Tree )
-.
+   parseNanoTokens(Tokens, Tree ).
 
-parseNanoTokens(Tokens, Tree) :- withExpr(Tree, Tokens, []).
+parseNanoTokens(Tokens, Tree) :- nanoFile(Tree,Tokens,[]).
+
 
 parseNanoAtom(Atom, Tree) :-
    tokenize_atom(Atom , Tokens),
-   parseNanoTokens(Tokens, Tree)
-.
+   parseNanoTokens(Tokens, Tree).
 
-parseExprStream(Stream, Tree) :-
+parseExprStream(Stream, Tree) :- 
    tokenize_stream(Stream , Tokens),
-   parseNanoTokens(Tokens, Tree)
-.
+   parseNanoTokens(Tokens, Tree). 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Init Parse %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% nanoFile -> Incia el proceso
+% declarationList -> Vela por la lista de declaraciones
+
+nanoFile( nanoProgram( decs(L),main(M)) ) --> declarationList(L),main(M).
+declarationList([]) --> [].
+declarationList([D|L]) --> declaration(D),declarationList(L).
+main(main(Body)) --> [main], ['{'] , body(Body) , [']'].
+body([]).
+declaration(dec()) --> dekKeyword(KeyWord), typeDeclaration(Type),id(I).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GRAMMAR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 withExpr(with(L, E)) --> ['with'], ['{'], listAssignments(L), ['}'], [eval], expr(E).

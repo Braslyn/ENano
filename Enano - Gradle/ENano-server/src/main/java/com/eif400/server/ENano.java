@@ -161,7 +161,7 @@ public class ENano extends RouterNanoHTTPD {
 	}
 	
     public static void main(String[] args ) throws IOException {
-		String PORT;
+		String PORT=null;
 		try{
         InputStream inputStream= new FileInputStream(new File("./web/properties/Enano.properties"));
 		Properties prop = new Properties();
@@ -169,8 +169,9 @@ public class ENano extends RouterNanoHTTPD {
 		PORT = prop.getProperty("port");
 		}catch(Exception e){
 			System.out.format("Archivo /properties/Enano.properties %s",e.getMessage());
-			PORT="8080";
 		}
+		if(PORT==null)
+			PORT="8080";
         new ENano(Integer.parseInt(PORT));
     }
 }

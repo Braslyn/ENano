@@ -1,0 +1,10 @@
+description = 'Compiler nanohttpd'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.eif400.server.ENCompiler'
+    }
+    from {
+        configurations.compile.collect{it.isDirectory() ? it : zipTree(it)}
+    }
+}

@@ -1,0 +1,8 @@
+project: Enano
+course: EIF400
+nrc: 50058
+version: 1.2
+repository: https://github.com/Braslyn/ENano 
+cycle: II-2020
+organization: UNA
+projectSite: http://titano.tech:5231/

@@ -1,0 +1,3 @@
+rootProject.name = 'TetseGaldre'
+
+include 'ENano-server', 'ENano-Compiler'

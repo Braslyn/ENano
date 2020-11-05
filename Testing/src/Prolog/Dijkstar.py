@@ -13,5 +13,5 @@ if __name__ == "__main__":
     jsonfile = open(sys.argv[1]).read()
     structure = json.loads(jsonfile)
     chargeStructure(structure,graph)
-    print(find_path(graph, 1, 4))
+    print(find_path(graph, int(sys.argv[2]), int(sys.argv[3])))
     

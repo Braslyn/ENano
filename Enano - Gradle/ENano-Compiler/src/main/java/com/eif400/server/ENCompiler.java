@@ -45,7 +45,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	Logger logger = Logger.getLogger(ENCompiler.class.getName());
 	
 	public static class CompileHandler extends DefaultHandler{
-		static String text;
+		String text;
 		@Override
         public String getText() {
             return text;
@@ -130,7 +130,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 		// Report diagnostics - adaptados para retonar json
 		text="";
 		if (diagsCollector.getDiagnostics().size() == 0){
-			text=String.format( "*** No errors found in %s ***", file );
+			text="*** No errors found ***";
 			file.delete();
 			//------------------------------------------------------------
 			text=String.format("{\"result\":\"%s\"}",text);
@@ -138,13 +138,16 @@ public class ENCompiler extends RouterNanoHTTPD {
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
 		}
-			var texto=diagsCollector.getDiagnostics().stream().
-								reduce(new StringBuffer("{\"result\": \""),(stbff,line)->stbff.append("Line: "+line.getLineNumber()+" "+line.getMessage( locale.ENGLISH ).replaceAll("\n"," ")),(x,y)-> x);	
-			file.delete();
-			text=texto.append("\"}").toString();
+		for( var d: diagsCollector.getDiagnostics() ) {
+			long pos = d.getLineNumber();
+			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
+			text+=String.format("%s %s \\n",
+				location, 
+				d.getMessage( locale.ENGLISH ).replaceAll("\n"," "));
+		}	
 			file.delete();
 			//------------------------------------------------------------
-			//text=String.format("{\"result\":\"%s\"}",text);
+			text=String.format("{\"result\":\"%s\"}",text);
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
@@ -184,7 +187,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	
 	
     public static void main(String[] args ) throws IOException {
-		String PORT;
+		String PORT=null;
 		try{
 		InputStream inputStream= new FileInputStream(new File("./web/properties/Ecompiler.properties"));
 		Properties prop = new Properties();
@@ -192,8 +195,10 @@ public class ENCompiler extends RouterNanoHTTPD {
 		PORT = prop.getProperty("port");
         }catch(Exception e){
 			System.out.format("Archivo /properties/Ecompiler.properties %s",e.getMessage());
-			PORT="9090";
+			
 		}
+		if(PORT==null)
+			PORT="9090";
         new ENCompiler(Integer.parseInt(PORT));
     }
 	

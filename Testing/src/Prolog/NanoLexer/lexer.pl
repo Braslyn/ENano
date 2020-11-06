@@ -96,24 +96,27 @@ finishSpecial([C | Input], [PC | Partial], Token, Input) :- doubleSpecial(PC, C)
                                                          convertToAtom([C, PC | Partial], Token) 
 . 
 
+finishSpecial([C | Input], [PC | Partial], _ , Rest) :- comment(PC, C),!, 
+                                                         skipLines( Input,[C|Partial],Rest) %mal
+.
+
+
+finishSpecial([C | Input], [PC | _], _, Rest) :- commentLine(PC, C),!, 
+                                          skipLine(Input,Rest)
+. %ok
+
 
 finishSpecial(Input, Partial, Token, Input) :- convertToAtom(Partial, Token) 
-.
-
-finishSpecial([C | Input], [PC | Partial], Token, Input) :- comment(PC, C),!, 
-                                                         convertToAtom([C, PC | Partial], Token) 
-.
-
-
-finishSpecial([C | Input], [PC | Partial], Token, Rest) :- commentLine(PC, C),!, 
-                                                      skipLine(Input, [C |Partial], Token,Rest). %mal
-
+. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %skip words
 
-skipLine(['\n'|Rest],_,_,Rest):-write(Rest),!.%mal
-skipLine([C | Input], Partial, Token, Rest) :- skipLine(Input, [C |Partial], Token, Rest).%mal
+skipLine(['\n'|Rest],Rest):-!.%mal
+skipLine([_| Input],Rest) :- skipLine(Input,Rest),!. %ok
+
+skipLines([C|Rest],[PC|_],Rest):-finishcomment(C,PC),!.
+skipLines([C|Input],[_|Partial],Rest):- skipLines(Input,[C|Partial],Rest),!.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -143,7 +146,7 @@ isLetterOrDigit(D) :- isDigit(D),!.
 
 isQuote('"'). 
 
-isSpecial(O)    :- member(O, ['=', '<', '>', '*', '-', '+', '/', '\\', '.', '(', ')','[',']']), !.
+isSpecial(O)    :- member(O, ['=', '<', '>', '*', '-','/', '+','\\', '.', '(', ')','[',']']), !.
 isSpecial(O)    :- member(O, ['{', '}', '&', '|', '%', '!', ';', ',']), !.
 isSpecial(O)    :- member(O, ['@', ':']), !.
 
@@ -157,6 +160,8 @@ doubleSpecial('-', '>'). % ->
 comment('/', '*'). % /*
 finishcomment('*', '/'). % */
 commentLine('/', '/'). % //
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classify_token(Token, num(Token)) :- re_match("^\\d+(\\.\\d+)?$", Token),!.
 classify_token(Token, id(Token))  :- re_match("^[a-zA-Z]+[\\w$]*$", Token),!.

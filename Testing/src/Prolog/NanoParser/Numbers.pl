@@ -1,7 +1,7 @@
 
 
 
-decimal(dec(Num)) --> (snum(L);num(L)),{convert_to_decimal(L,Num)}.
+decimal(dec(Num)) --> (snum(L)|num(L)),{convert_to_decimal(L,Num)}.
 
 snum([D|R])--> sign(D),restnum(R). 
 num([D|R]) -->digit(D),restnum(R).

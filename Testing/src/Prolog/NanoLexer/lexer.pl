@@ -129,7 +129,10 @@ doubleSpecial('<', '='). % <=
 doubleSpecial('>', '='). % >=
 doubleSpecial('&', '&'). % &&
 doubleSpecial('|', '|'). % &&
-doubleSpecial('=', '>').
+doubleSpecial('-', '>'). % ->
+doubleSpecial('/', '*'). % ->
+doubleSpecial('*', '/'). % ->
+doubleSpecial('/', '/'). % ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classify_token(Token, num(Token)) :- re_match("^\\d+(\\.\\d+)?$", Token),!.
 classify_token(Token, id(Token))  :- re_match("^[a-zA-Z]+[\\w$]*$", Token),!.

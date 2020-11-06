@@ -45,7 +45,7 @@ http_parameters(Request,[text(Text)],
 
 
 post(Text,Reply) :- save_text('./private/File.no', Text),
-        tokenize_file('./private/File.no',Result),write(Result),
+        parse('./private/File.no',Result),write(Result),
         http_post('http://localhost:9090/compile', 
                   atom('text/plain;charset=utf-8', Text), 
                   Reply,

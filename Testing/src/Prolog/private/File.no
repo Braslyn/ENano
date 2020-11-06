@@ -1,1 +1,17 @@
-asdas adsasd
+/*
+Demo1
+Asuma archivo se llama Demo1.no
+*/
+
+val <int> x = 666
+val < int -> int > abs = x -> x if x >= 0 else - x
+
+method <int -> int > fact(n) = 1 if n == 0 else n * fact(n - 1)
+
+main { // Main del programa
+ println(String.format("abs(%d)=%d", -x, this.abs.apply(-x)))
+ println(String.format("fact(%d)=%d", 5, fact(5)))
+ val <int> x = 999 
+ val < [ int ] > list = [1, -2, 3, x + x]
+ println(list) 
+}

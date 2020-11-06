@@ -59,6 +59,8 @@ startOneToken([C | Input], Partial, Token, Rest) :- isLetter(C), !,
                                                     finishId(Input, [ C | Partial], Token, Rest)
 .
 
+
+
 startOneToken([C | Input], Partial, Token, Rest) :- isSpecial(C), !,
                                                     finishSpecial(Input, [ C | Partial], Token, Rest)
 .
@@ -89,11 +91,33 @@ finishQuote([C | Input], Partial, Token, Rest) :- finishQuote(Input, [C |Partial
 finishQuote([] , _Partial, _Token, _Input) :- throw('opened and not closed string') 
 .
 % SPECIAL
+
 finishSpecial([C | Input], [PC | Partial], Token, Input) :- doubleSpecial(PC, C), !, 
                                                          convertToAtom([C, PC | Partial], Token) 
-.
+. 
+
+
 finishSpecial(Input, Partial, Token, Input) :- convertToAtom(Partial, Token) 
 .
+
+finishSpecial([C | Input], [PC | Partial], Token, Input) :- comment(PC, C),!, 
+                                                         convertToAtom([C, PC | Partial], Token) 
+.
+
+
+finishSpecial([C | Input], [PC | Partial], Token, Rest) :- commentLine(PC, C),!, 
+                                                      skipLine(Input, [C |Partial], Token,Rest). %mal
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%skip words
+
+skipLine(['\n'|Rest],_,_,Rest):-write(Rest),!.%mal
+skipLine([C | Input], Partial, Token, Rest) :- skipLine(Input, [C |Partial], Token, Rest).%mal
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % FINISH TOKEN
 finishToken([C | Input], Continue, Partial, Token, Rest) :- call(Continue, C), !, 
                                                             finishToken(Input, Continue, [ C | Partial], Token, Rest)
@@ -119,7 +143,7 @@ isLetterOrDigit(D) :- isDigit(D),!.
 
 isQuote('"'). 
 
-isSpecial(O)    :- member(O, ['=', '<', '>', '*', '-', '+', '/', '\\', '.', '(', ')']), !.
+isSpecial(O)    :- member(O, ['=', '<', '>', '*', '-', '+', '/', '\\', '.', '(', ')','[',']']), !.
 isSpecial(O)    :- member(O, ['{', '}', '&', '|', '%', '!', ';', ',']), !.
 isSpecial(O)    :- member(O, ['@', ':']), !.
 
@@ -130,9 +154,9 @@ doubleSpecial('>', '='). % >=
 doubleSpecial('&', '&'). % &&
 doubleSpecial('|', '|'). % &&
 doubleSpecial('-', '>'). % ->
-doubleSpecial('/', '*'). % ->
-doubleSpecial('*', '/'). % ->
-doubleSpecial('/', '/'). % ->
+comment('/', '*'). % /*
+finishcomment('*', '/'). % */
+commentLine('/', '/'). % //
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 classify_token(Token, num(Token)) :- re_match("^\\d+(\\.\\d+)?$", Token),!.
 classify_token(Token, id(Token))  :- re_match("^[a-zA-Z]+[\\w$]*$", Token),!.
@@ -140,8 +164,7 @@ classify_token(Token, id(Token))  :- re_match("^[a-zA-Z]+[\\w$]*$", Token),!.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% UTIL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 convertToAtom(Partial, Token) :- reverse(Partial, TokenCodes), 
                                  atom_codes(Token, TokenCodes)
-.
-
+. 
 
 codes_to_chars(Lcodes, Lchars):-
     atom_codes(Atom_from_codes, Lcodes), 

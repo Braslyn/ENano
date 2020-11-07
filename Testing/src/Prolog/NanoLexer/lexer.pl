@@ -96,8 +96,8 @@ finishSpecial([C | Input], [PC | Partial], Token, Input) :- doubleSpecial(PC, C)
                                                          convertToAtom([C, PC | Partial], Token) 
 . 
 
-finishSpecial([C | Input], [PC | Partial], _ , Rest) :- comment(PC, C),!, 
-                                                         skipLines( Input,[C|Partial],Rest) %mal
+finishSpecial([C | Input], [PC | _], _ , Rest) :- comment(PC, C),!, 
+                                                         skipLines( Input,Rest) %mal
 .
 
 
@@ -109,17 +109,22 @@ finishSpecial([C | Input], [PC | _], _, Rest) :- commentLine(PC, C),!,
 finishSpecial(Input, Partial, Token, Input) :- convertToAtom(Partial, Token) 
 . 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% skipLines([A,s,u,m,a,' ',a,r,c,h,i,v,o,' ',s,e,' ',l,l,a,m,a,' ',D,e,m,o,1,.,n,o,' ',*,/,' ',s,a],[' '],R).
 %skip words
 
-skipLine(['\n'|Rest],Rest):-!.%mal
-skipLine([_| Input],Rest) :- skipLine(Input,Rest),!. %ok
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Comentarios de una linea
 
-skipLines([C|Rest],[PC|_],Rest):-finishcomment(C,PC),!.
-skipLines([C|Input],[_|Partial],Rest):- skipLines(Input,[C|Partial],Rest),!.
+skipLine(['\n'|Rest],Rest):-!.%ok
+skipLine([_|Input],Rest) :- skipLine(Input,Rest),!. %ok
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Comentarios de multiple linea
+skipLines([C|Input],Rest):- skipLines2(Input,[C],Rest),!.
+skipLines2(['/'|Rest],['*'],Rest):-!.
+skipLines2([C|Input],_,Rest):-skipLines2(Input,[C],Rest),!.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% a(R),post(R,Json).  write(C),write(PC),write('\n')
 
 % FINISH TOKEN
 finishToken([C | Input], Continue, Partial, Token, Rest) :- call(Continue, C), !, 

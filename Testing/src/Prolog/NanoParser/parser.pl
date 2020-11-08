@@ -42,7 +42,7 @@ declarationList([]) --> [].
 
 declarationList([D|L]) --> declaration(D),declarationList(L).
 
-declaration(dec(K,T,I,E)) --> dekKeyword(K), typeDeclaration(T), id(I),expresion(E).
+declaration(dec(K,T,I,E)) --> dekKeyword(K), typeDeclaration(T), identificator(I),expresion(E).
 
 typeDeclaration(declar(Type)) --> ['<'], type(Type) , ['>'].
 
@@ -52,34 +52,97 @@ type(S) --> [S],{basicType(S)}.%ok unit
 
 type(list(S)) --> ['['],[S],{basicType(S)},[']']. % List 
 
-basicType(S):-member(S,[int,string,float,double]),!.
+basicType(S):-member(S,[int,string,float,double]),!. %%%%%%%%%%%%%%%%% types
 
-dekKeyword(S)-->[S],{member(S, [var,val,method])},{!}.%ok
+dekKeyword(S)-->[S],{member(S, [var,val,method])},{!}.%ok %%%%%%%%%%%% key words
 
 %%%%%%%%%%%%%%%%%%%% Expresions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 expresion([])-->[].
-expresion(Exp)--> ['='] , [Exp].
-if(if(X,Body,Else)) --> [if], predicate(X) , else(Else).
+expresion(Exp)--> ['='] , numbs(Exp).
+expresion(Exp)-->['='], lamda(Exp).
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Lambda %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+/*
+
+  X -> ????, X -> X , x -> x+1 , X -> X 'x' R , X -> 1 if (predicado) else -X 
+
+*/
+
+lamda(lambda(X,body(N)))--> id(X) , ['->'] , variable(N).
+
+lamda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
+
+operation(T) --> variable(X) , operations(Oper), variable(Y),{build_tree(Oper,[X|Y],T)}. %modificar
+
+%%%%%%%%%%%%%%%%%%%%%%%% if -- ternario %%%%%%%%%%%%%%%%%%%%%%%
+
+if(if(X,Body,Else)) --> [if], predicate(X) ,lines(Body), else(Else).
 else([]) --> [].
 else(Else)--> lines(Else). 
-predicate(predicate(comp(X,S,Se))) --> [S] , comparator(X) , [Se].
+predicate(predicate(comp(X,S,Se))) --> variable(S) , comparator(X) , variable(Se).
+
+declarativeIf(dIf(X,N,Y)) --> variable(X) , [if] , predicate(N) , [else], variable(Y).
+
+%%%%%%%%%%%%%%%%%%%% numbers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+variable(V)--> (numbs(V)|id(V)).
+
+
+numbs(N) --> (snum(X)|num(X)),{atomic_list_concat(X, N)}. %ok
+
+
+num([N|Next])--> digits(N),!,anum(Next). %ok          1.xxxx
+num([D|N])--> [D],{dot(D)},!,fract(N). % ok    .123(e10)
+
+
+anum([D|N])--> [D],{dot(D)}, !,fract(N).
+anum([E|R])--> eExponent(E), !,exponential(R). %ok
+anum([])-->[],!.
+
+snum([S|N])--> sign(S),num(N). %ok
+
+
+fract([E|N])--> eExponent(E),exponential(N),!. %ok
+fract([N|E])--> digits(N),exponents(E),!.%ok
+fract([N]) --> digits(N),!. %ok
+fract([])-->[],!. %ok
+
+exponents([E|R])--> eExponent(E),exponential(R). %ok
+exponential([S,N])--> sign(S) , {!} ,digits(N).%ok
+exponential([N])--> digits(N). %ok
+
+%%%%%%%%%%%%%%%%%% special for numbers %%%%%%%%%%%%%%%%&&&
+digits(D)-->[D],{atom_number(D,Num),number(Num)}.%ok
+sign(S)-->[S],{member(S,['-','+']),!}. %ok
+dot('.'). %ok
+eExponent(E)--> [E],{member(E,['E','e']),!}.%ok
+
 
 %%%%%%%%%%%%%%%%%%%% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 lines([])-->[].
+
 lines([L|Li]) --> line(L),lines(Li).
 
 line(L)--> if(L).
 
-line(L)-->withExpr(L).
+line(L)--> withExpr(L).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Comparator %%%%%%%%%%%%%%%%%%%%%%%%%
 comparator(X) --> [X],{member(X,['>','<','==','!','<=','>='])}.
-
+operations(X) --> [X],{member(X,['+','-','*','/','**'])}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+identificator(X)--> (id(X)|function(X)).
+
+function(funct(Nom,Vars))--> variable(Nom),['('], params(Vars),[')'].
+
+params([F|R]) --> id(F),!,params(R).
+params([])-->[].
+
 id(S)-->[S],{valid_id(S)}.%ok
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 valid_id(V) :- re_match("[a-zA-Z_][\\w]*", V).% +-
 

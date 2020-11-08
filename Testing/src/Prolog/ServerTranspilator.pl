@@ -80,8 +80,11 @@ allFile('/*
 }').
 
 
-simpleTest('var <int -> double > foo
-    val <float> goo
+simpleTest('var <int -> double > foo 
+    val <float -> int> goo = x -> x+5
+    val <double -> double> hoo = X -> 666
+    var <double> joo = 2e-10
+    //method <int -> int > fact(n) = 1 if n == 0 else n
     main{}'). 
 
 

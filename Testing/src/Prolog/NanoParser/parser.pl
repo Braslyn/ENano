@@ -16,8 +16,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Entry Point %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 parseNanoFile(File, Tree) :-
-   tokenize(File, Tokens),
-   parseNanoTokens(Tokens, Tree ).
+   tokenize(File, Tokens),parseNanoTokens(Tokens, Tree ).
 
 parseNanoTokens(Tokens, Tree) :- nanoFile(Tree,Tokens,[]).
 
@@ -34,13 +33,61 @@ parseExprStream(Stream, Tree) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Init Parse %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % nanoFile -> Incia el proceso
 % declarationList -> Vela por la lista de declaraciones
+% main() vira porque que el main este correcto.
 
-nanoFile( nanoProgram( decs(L),main(M)) ) --> declarationList(L),main(M).
+nanoFile( nanoProgram(declars(L),main(M)) ) --> declarationList(L),main(M).
+
+%%%%%%%%%%%% Delcarations %%%%%%%%%%%%%%%%
 declarationList([]) --> [].
+
 declarationList([D|L]) --> declaration(D),declarationList(L).
-main(main(Body)) --> [main], ['{'] , body(Body) , [']'].
-body([]).
-declaration(dec()) --> dekKeyword(KeyWord), typeDeclaration(Type),id(I).
+
+declaration(dec(K,T,I,E)) --> dekKeyword(K), typeDeclaration(T), id(I),expresion(E).
+
+typeDeclaration(declar(Type)) --> ['<'], type(Type) , ['>'].
+
+type(arrow(S,L)) --> [S],{basicType(S)}, ['->'], [L],{basicType(L)}. % arrow -> [var,<,int,'->',int,>, foo]
+
+type(S) --> [S],{basicType(S)}.%ok unit
+
+type(list(S)) --> ['['],[S],{basicType(S)},[']']. % List 
+
+basicType(S):-member(S,[int,string,float,double]),!.
+
+dekKeyword(S)-->[S],{member(S, [var,val,method])},{!}.%ok
+
+%%%%%%%%%%%%%%%%%%%% Expresions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+expresion([])-->[].
+expresion(Exp)--> ['='] , [Exp].
+if(if(X,Body,Else)) --> [if], predicate(X) , else(Else).
+else([]) --> [].
+else(Else)--> lines(Else). 
+predicate(predicate(comp(X,S,Se))) --> [S] , comparator(X) , [Se].
+
+%%%%%%%%%%%%%%%%%%%% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+lines([])-->[].
+lines([L|Li]) --> line(L),lines(Li).
+
+line(L)--> if(L).
+
+line(L)-->withExpr(L).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Comparator %%%%%%%%%%%%%%%%%%%%%%%%%
+comparator(X) --> [X],{member(X,['>','<','==','!','<=','>='])}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+id(S)-->[S],{valid_id(S)}.%ok
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+valid_id(V) :- re_match("[a-zA-Z_][\\w]*", V).% +-
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%  Main  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+main(main(Body)) --> [main], ['{'], body(Body), ['}'].
+
+body([]),['}'] --> ['}'].
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GRAMMAR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,7 +110,6 @@ monom(M) --> factorMult(M).
 factorMult(T) --> factorExpr(F), restFactorMult(RF), {build_tree('*', [F | RF], T)}.
 restFactorMult([]) --> [].
 restFactorMult([RM]) --> ['*'], monom(RM).
-
 
 factorExpr(E) --> ['('], expr(E), [')'].
 factorExpr(N) --> [A], {atom_number(A, N), !}.

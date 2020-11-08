@@ -16,7 +16,7 @@ since: 2020
 :- use_module(library(http/http_cors)).
 :- use_module(library(http/http_client)).
 :- use_module(library(http/http_json)).
-:- use_module('./NanoLexer/lexer', [tokenize_file/2 as parse
+:- use_module('./NanoParser/parser', [parseNanoFile/2 as parse
                  ]).
 
 
@@ -61,23 +61,40 @@ save_text(Path, Text) :-
 
 
 
-a('/*
-Demo1
-Asuma archivo se llama Demo1.no
-*/
-
-val <int> x = 666
-val < int -> int > abs = x -> x if x >= 0 else - x
-
-method <int -> int > fact(n) = 1 if n == 0 else n * fact(n - 1)
-
-main { // Main del programa
- println(String.format("abs(%d)=%d", -x, this.abs.apply(-x)))
- println(String.format("fact(%d)=%d", 5, fact(5)))
- val <int> x = 999 
- val < [ int ] > list = [1, -2, 3, x + x]
- println(list) 
+allFile('/*
+    Demo1
+    Asuma archivo se llama Demo1.no
+  */
+  
+  val <int> x = 666
+  val < int -> int > abs = x -> x if x >= 0 else - x
+  
+  method <int -> int > fact(n) = 1 if n == 0 else n * fact(n - 1)
+  
+  main { // Main del programa
+     println(String.format("abs(%d)=%d", -x, this.abs.apply(-x)))
+     println(String.format("fact(%d)=%d", 5, fact(5)))
+     val <int> x = 999 
+     val < [ int ] > list = [1, -2, 3, x + x]
+     println(list) 
 }').
+
+
+simpleTest('var <int -> double > foo
+    val <float> goo
+    main{}'). 
+
+
+
+simpleTest2('val < double > PI = 3.14
+    val < double > E = 2.718
+    var <int> x
+    val < double -> double > foo = 50
+    main {}').
+
+
+
+
 
 %probar ?- post('texto en general',Json). 
 %probar con a a(R),post(a,Json).

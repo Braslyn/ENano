@@ -1,5 +1,12 @@
-val < double > PI = 3.14
-    val < double > E = 2.718
-    var <int> x
-    val < double -> double > foo = 50
-    main {}
+var <int -> double > foo 
+    val <float -> int> goo = x -> x+5
+    val <int> x = 666
+    val < int -> int > abs = x -> x if x >= 0 else x
+    method <int -> int > fact(n) = 1 if n == 0 else n
+    main{
+       if(x>10)
+            var <float> k = 6
+        val < [ int ] > list = []
+        println(fact(k))
+
+    }

@@ -1,34 +1,17 @@
 
 
 
-decimal(dec(Num)) --> (snum(L)|num(L)),{convert_to_decimal(L,Num)}.
+%cicloHamiltoneano(_,_,[]).%La idea era que si encontraba vacio hiciera uno almenos , mi teoria esque encuentra el vacio en vacio y por eso el prinmer caso, no avanza
+cicloHamiltoneano(A,N,R):- cicloHamiltoneano2(A,[N,N],R).
 
-snum([D|R])--> sign(D),restnum(R). 
-num([D|R]) -->digit(D),restnum(R).
-
-restnum([]) --> [].
-restnum([D|R]) --> digit(D),restnum(R).
-%restnum([D|R]) --> exponents(D),expo(R).
-restnum([D|R]) --> dot(D),fract(R).
+cicloHamiltoneano2([],_,[]):-fail.
+cicloHamiltoneano2(A,[N,M],[M,Y]):- member([M,Y],A) ,Y=N,!. 
+cicloHamiltoneano2(A,[N,M],[M|R]):- member([M,Y],A),!,cicloHamiltoneano2(A,[N,Y],R).
 
 
-%expo([D|R]) --> sign(D),finalexp(R). 
-%finalexp([D|R]) --> digit(D),finalexp(R).
+subpalindrome([],[]).
+subpalindrome(Hilera,L):- reverse(Hilera, L), Hilera=L,!.
 
-fract([]) --> [].
-fract([D|R]) --> digit(D),fract(R).
+subpalindrome(Hilera,LI):- sublist(Hilera,Li), subpalindrome(Li,R).
 
-digit(D) --> [D] , { D @>='0' ,D @=< '9'}.
-
-dot('.') --> ['.'].
-
-sign(S)--> [S],{is_sign(S)}.
-
-is_sign('+').
-is_sign('-').
-
-%exponents(E)-->[E],{member(E,['E','e'])}.
-
-convert_to_decimal(L,Dec) :- atomic_list_concat(L, '',Anum),atom_number(Anum,Dec).
-
-test(A,Num):- re_split('//w'/a,A,L),delete(L,'',Tokens),write(Tokens),decimal(dec(Num),Tokens,[]),!.
+sublist([H|R],[[H],R]).

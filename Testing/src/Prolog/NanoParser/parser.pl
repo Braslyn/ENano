@@ -44,7 +44,7 @@ declarationList([D|L]) --> declaration(D),declarationList(L).
 
 declaration(dec(K,T,I,E)) --> dekKeyword(K), typeDeclaration(T), identificator(I),expresion(E).
 
-typeDeclaration(declar(Type)) --> ['<'], type(Type) , ['>'].
+typeDeclaration(type(Type)) --> ['<'], type(Type) , ['>'].
 
 type(arrow(S,L)) --> [S],{basicType(S)}, ['->'], [L],{basicType(L)}. % arrow -> [var,<,int,'->',int,>, foo]
 
@@ -59,8 +59,16 @@ dekKeyword(S)-->[S],{member(S, [var,val,method])},{!}.%ok %%%%%%%%%%%% key words
 %%%%%%%%%%%%%%%%%%%% Expresions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 expresion([])-->[].
-expresion(Exp)--> ['='] , numbs(Exp).
-expresion(Exp)-->['='], lamda(Exp).
+expresion(Exp)--> ['='] ,numbs(Exp).
+expresion(Exp)-->['='], lambda(Exp).
+expresion(Exp)-->['='], declarativeIf(Exp).
+expresion(Exp)-->['='], list(Exp).
+
+%%%%%%%%%%%%%%%%%%%%%%%%% list exp %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+list(L)--> ['['], listBody(L) ,[']'].
+listBody([])--> [].
+listBody(body([V|R]))--> generalVariable(V), listBody(R).
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Lambda %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 /*
@@ -68,24 +76,29 @@ expresion(Exp)-->['='], lamda(Exp).
   X -> ????, X -> X , x -> x+1 , X -> X 'x' R , X -> 1 if (predicado) else -X 
 
 */
+lambda(lambda(X,body(N))) --> id(X) , ['->'], declarativeIf(N). 
 
-lamda(lambda(X,body(N)))--> id(X) , ['->'] , variable(N).
+lambda(lambda(X,body(N)))--> id(X) , ['->'] , variable(N).
 
-lamda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
+lambda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
 
-operation(T) --> variable(X) , operations(Oper), variable(Y),{build_tree(Oper,[X|Y],T)}. %modificar
 
+
+operation(oper(Oper,X,Y)) --> generalVariable(X) , operations(Oper), generalVariable(Y). 
 %%%%%%%%%%%%%%%%%%%%%%%% if -- ternario %%%%%%%%%%%%%%%%%%%%%%%
 
-if(if(X,Body,Else)) --> [if], predicate(X) ,lines(Body), else(Else).
+if(if(X,Body,Else)) --> [if], ['('],predicate(X) ,lines(Body),[')'], else(Else).
 else([]) --> [].
-else(Else)--> lines(Else). 
-predicate(predicate(comp(X,S,Se))) --> variable(S) , comparator(X) , variable(Se).
+else(Else)--> lines(Else).
 
-declarativeIf(dIf(X,N,Y)) --> variable(X) , [if] , predicate(N) , [else], variable(Y).
+predicate(predicate(X,S,Se)) --> variable(S) , comparator(X) , variable(Se).
+
+declarativeIf(dIf(X,N,Y)) --> generalVariable(X) , [if] , predicate(N) , [else], variable(Y).
 
 %%%%%%%%%%%%%%%%%%%% numbers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-variable(V)--> (numbs(V)|id(V)).
+generalVariable(GV)-->(function(GV)|variable(GV)). 
+
+variable(V)-->(id(V)|numbs(V)),!.
 
 
 numbs(N) --> (snum(X)|num(X)),{atomic_list_concat(X, N)}. %ok
@@ -112,10 +125,14 @@ exponential([S,N])--> sign(S) , {!} ,digits(N).%ok
 exponential([N])--> digits(N). %ok
 
 %%%%%%%%%%%%%%%%%% special for numbers %%%%%%%%%%%%%%%%&&&
+
 digits(D)-->[D],{atom_number(D,Num),number(Num)}.%ok
 sign(S)-->[S],{member(S,['-','+']),!}. %ok
 dot('.'). %ok
 eExponent(E)--> [E],{member(E,['E','e']),!}.%ok
+%%%%%%%%%%%%%%%%%%%%%%% Println() %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+println(print(X)) --> [println] , ['('],generalVariable(X),[')'].
 
 
 %%%%%%%%%%%%%%%%%%%% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -126,12 +143,20 @@ lines([L|Li]) --> line(L),lines(Li).
 
 line(L)--> if(L).
 
+line(L)--> declaration(L).
+
 line(L)--> withExpr(L).
 
+line(L)--> println(L).
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Comparator %%%%%%%%%%%%%%%%%%%%%%%%%
-comparator(X) --> [X],{member(X,['>','<','==','!','<=','>='])}.
-operations(X) --> [X],{member(X,['+','-','*','/','**'])}.
+comparator(X) --> [X],{isComparator(X)}.
+operations(X) --> [X],{isOperation(X)}.
+
+
+isComparator(X):- member(X,['>','<','==','!','<=','>=']),!.
+
+isOperation(X):- member(X,['+','-','*','/','**']),!.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 identificator(X)--> (id(X)|function(X)).
@@ -141,17 +166,17 @@ function(funct(Nom,Vars))--> variable(Nom),['('], params(Vars),[')'].
 params([F|R]) --> id(F),!,params(R).
 params([])-->[].
 
-id(S)-->[S],{valid_id(S)}.%ok
+id(S)-->[S],{!,valid_id(S)}.%ok
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-valid_id(V) :- re_match("[a-zA-Z_][\\w]*", V).% +-
+valid_id(V) :- re_match("^[a-zA-Z_]+[\\w]*$", V).% +-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%  Main  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 main(main(Body)) --> [main], ['{'], body(Body), ['}'].
 
 body([]),['}'] --> ['}'].
-
+body([L|R]) --> line(L),lines(R). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GRAMMAR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 withExpr(with(L, E)) --> ['with'], ['{'], listAssignments(L), ['}'], [eval], expr(E).

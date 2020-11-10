@@ -18,7 +18,7 @@
 parseNanoFile(File, Tree) :-
    tokenize(File, Tokens),parseNanoTokens(Tokens, Tree ).
 
-parseNanoTokens(Tokens, Tree) :- nanoFile(Tree,Tokens,[]).
+parseNanoTokens(Tokens, Tree) :- write(Tokens),nanoFile(Tree,Tokens,[]).
 
 
 parseNanoAtom(Atom, Tree) :-
@@ -58,18 +58,23 @@ dekKeyword(S)-->[S],{member(S, [var,val,method])},{!}.%ok %%%%%%%%%%%% key words
 
 %%%%%%%%%%%%%%%%%%%% Expresions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-expresion([])-->[].
+
+expresion(Exp)--> ['='] ,vstring(Exp).
 expresion(Exp)--> ['='] ,numbs(Exp).
 expresion(Exp)-->['='], lambda(Exp).
 expresion(Exp)-->['='], declarativeIf(Exp).
 expresion(Exp)-->['='], list(Exp).
+expresion([])-->[],!.
 
+
+vstring(X) --> [X],{isString(X)}.
 %%%%%%%%%%%%%%%%%%%%%%%%% list exp %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 list(L)--> ['['], listBody(L) ,[']'].
-listBody([])--> [].
-listBody(body([V|R]))--> generalVariable(V), listBody(R).
-
+listBody(body([V|R])) --> (generalVariable(V)|operation(V)), listBody2(R).
+listBody([])--> [],!.
+listBody2([V|R]) --> [','], (generalVariable(V)|operation(V)),listBody2(R). 
+listBody2([])-->[],!.
 %%%%%%%%%%%%%%%%%%%%%%%%% Lambda %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 /*
 
@@ -83,8 +88,10 @@ lambda(lambda(X,body(N)))--> id(X) , ['->'] , variable(N).
 lambda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
 
 
-
-operation(oper(Oper,X,Y)) --> generalVariable(X) , operations(Oper), generalVariable(Y). 
+operation(oper(Oper,X,Y)) --> generalVariable(X) , operations(Oper), generalVariable(Y).
+operation(oper(Oper,X,Y)) --> operation(X), operations(Oper), generalVariable(Y).
+operation(oper(Oper,X,Y)) --> generalVariable(Y), operations(Oper), operation(X).  
+operation(oper(Oper,X,Y)) --> operation(X), operations(Oper), operation(Y).
 %%%%%%%%%%%%%%%%%%%%%%%% if -- ternario %%%%%%%%%%%%%%%%%%%%%%%
 
 if(if(X,Body,Else)) --> [if], ['('],predicate(X) ,lines(Body),[')'], else(Else).
@@ -98,7 +105,7 @@ declarativeIf(dIf(X,N,Y)) --> generalVariable(X) , [if] , predicate(N) , [else],
 %%%%%%%%%%%%%%%%%%%% numbers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 generalVariable(GV)-->(function(GV)|variable(GV)). 
 
-variable(V)-->(id(V)|numbs(V)),!.
+variable(V)-->(id(V)|numbs(V)|vstring(V)),!.
 
 
 numbs(N) --> (snum(X)|num(X)),{atomic_list_concat(X, N)}. %ok
@@ -130,9 +137,22 @@ digits(D)-->[D],{atom_number(D,Num),number(Num)}.%ok
 sign(S)-->[S],{member(S,['-','+']),!}. %ok
 dot('.'). %ok
 eExponent(E)--> [E],{member(E,['E','e']),!}.%ok
+
+
+%%%%%%%%%%%%%%%%%%%%%%% Objects %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+sObjects(obj(X,Y))--> [this],['.'],id(X),method(Y).
+method(M)--> ['.'],function(M).
+method([])-->[].
+
+format(S,P) --> ['String'],['.'],['format'],['('],vstring(S),params(P),[')'].
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%% Println() %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 println(print(X)) --> [println] , ['('],generalVariable(X),[')'].
+println(print(M)) --> [println] , ['('],sObjects(M),[')'].
 
 
 %%%%%%%%%%%%%%%%%%%% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -163,14 +183,14 @@ identificator(X)--> (id(X)|function(X)).
 
 function(funct(Nom,Vars))--> variable(Nom),['('], params(Vars),[')'].
 
-params([F|R]) --> id(F),!,params(R).
+params([V|R]) --> generalVariable(V),!,params(R).
 params([])-->[].
 
 id(S)-->[S],{!,valid_id(S)}.%ok
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-valid_id(V) :- re_match("^[a-zA-Z_]+[\\w]*$", V).% +-
-
+valid_id(V) :- re_match("^[a-zA-Z_]+[\\w]*$", V).% ok
+isString(S) :- re_match("^\".*\"$",S).% ok 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%  Main  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 main(main(Body)) --> [main], ['{'], body(Body), ['}'].
@@ -203,7 +223,7 @@ factorExpr(E) --> ['('], expr(E), [')'].
 factorExpr(N) --> [A], {atom_number(A, N), !}.
 factorExpr(A) --> [A], {atomic(A), !}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Semantic Helpers %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Semantic Helpers %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 build_tree(_, [Left], Left).
 build_tree(Oper, [Left, Right], T) :- T =.. [Oper, Left, Right].
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

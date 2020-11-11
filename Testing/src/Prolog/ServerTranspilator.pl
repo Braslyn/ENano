@@ -67,12 +67,12 @@ allFile('/*
   */
   
   val <int> x = "666"
-  val < int -> int > abs = x -> x if x >= 0 else - x
+  val < int -> int > abs = x -> x if x >= 0 else x
   
-  method <int -> int > fact(n) = 1 if n == 0 else n * fact(n - 1)
+  method <int -> int > fact(n) = 1 if n == 0 else n //* fact(n - 1)
   
   main { // Main del programa
-     println(String.format("abs(%d)=%d", -x, this.abs.apply(-x)))
+     println(String.format("abs(%d)=%d", -x, this.abs.apply(x)))
      println(String.format("fact(%d)=%d", 5, fact(5)))
      val <int> x = 999 
      val < [ int ] > list = [1, -2, 3, x + x]
@@ -81,7 +81,6 @@ allFile('/*
 
 
 simpleTest('
-    "666"
     var <int -> double > foo 
     val <float -> int> goo = x -> x+5
     val <int> x = "666"
@@ -89,18 +88,20 @@ simpleTest('
     method <int -> int > fact(n) = 1 if n == 0 else n
     main{
        if(x>10)
-            var <float> k = 6
+        var <float> k = 6
         val < [ int ] > list = [1, -2, 3, x + x]
         println(fact(k))
+        println(String.format("",this.abs.apply(6)))
 
     }'). 
 
 
 
 simpleTest2('val < double > PI = 3.14
-    val < double > E = 2.718
-    var <int> x
+    val < double > E = "2.718"
+    var <int> x = x -> x+1
     val < double -> double > foo = 50
+    method <int -> int > fact(n) = 1 if n == 0 else n
     main {}').
 
 

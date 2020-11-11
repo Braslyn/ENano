@@ -18,7 +18,7 @@
 parseNanoFile(File, Tree) :-
    tokenize(File, Tokens),parseNanoTokens(Tokens, Tree ).
 
-parseNanoTokens(Tokens, Tree) :- write(Tokens),nanoFile(Tree,Tokens,[]).
+parseNanoTokens(Tokens, Tree) :- nanoFile(Tree,Tokens,[]).
 
 
 parseNanoAtom(Atom, Tree) :-
@@ -52,7 +52,7 @@ type(S) --> [S],{basicType(S)}.%ok unit
 
 type(list(S)) --> ['['],[S],{basicType(S)},[']']. % List 
 
-basicType(S):-member(S,[int,string,float,double]),!. %%%%%%%%%%%%%%%%% types
+basicType(S):- member(S,[int,string,float,double]),!. %%%%%%%%%%%%%%%%% types
 
 dekKeyword(S)-->[S],{member(S, [var,val,method])},{!}.%ok %%%%%%%%%%%% key words
 
@@ -103,7 +103,7 @@ predicate(predicate(X,S,Se)) --> variable(S) , comparator(X) , variable(Se).
 declarativeIf(dIf(X,N,Y)) --> generalVariable(X) , [if] , predicate(N) , [else], variable(Y).
 
 %%%%%%%%%%%%%%%%%%%% numbers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-generalVariable(GV)-->(function(GV)|variable(GV)). 
+generalVariable(GV)-->(function(GV)|variable(GV)|sObjects(GV)). 
 
 variable(V)-->(id(V)|numbs(V)|vstring(V)),!.
 
@@ -145,15 +145,13 @@ sObjects(obj(X,Y))--> [this],['.'],id(X),method(Y).
 method(M)--> ['.'],function(M).
 method([])-->[].
 
-format(S,P) --> ['String'],['.'],['format'],['('],vstring(S),params(P),[')'].
-
-
+sformat(format(S,P)) --> ['String'],['.'],['format'],['('],vstring(S),[','],params(P),[')'].
 
 %%%%%%%%%%%%%%%%%%%%%%% Println() %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 println(print(X)) --> [println] , ['('],generalVariable(X),[')'].
 println(print(M)) --> [println] , ['('],sObjects(M),[')'].
-
+println(print(F)) --> [println] , ['('],sformat(F),[')'].
 
 %%%%%%%%%%%%%%%%%%%% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -169,6 +167,8 @@ line(L)--> withExpr(L).
 
 line(L)--> println(L).
 
+line(L)--> sformat(L).
+
 %%%%%%%%%%%%%%%%%%%%%%%%% Comparator %%%%%%%%%%%%%%%%%%%%%%%%%
 comparator(X) --> [X],{isComparator(X)}.
 operations(X) --> [X],{isOperation(X)}.
@@ -183,8 +183,9 @@ identificator(X)--> (id(X)|function(X)).
 
 function(funct(Nom,Vars))--> variable(Nom),['('], params(Vars),[')'].
 
-params([V|R]) --> generalVariable(V),!,params(R).
-params([])-->[].
+params([V|R]) --> generalVariable(V),!,params2(R).
+params2([V|R])--> [','] , generalVariable(V),!,params2(R).
+params2([])-->[].
 
 id(S)-->[S],{!,valid_id(S)}.%ok
 

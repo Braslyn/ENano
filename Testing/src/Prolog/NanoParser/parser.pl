@@ -147,6 +147,7 @@ method([])-->[].
 
 sformat(format(S,P)) --> ['String'],['.'],['format'],['('],vstring(S),[','],params(P),[')'].
 
+
 %%%%%%%%%%%%%%%%%%%%%%% Println() %%%%%%%%%%%%%%%%%%%%%%%%%%
 
 println(print(X)) --> [println] , ['('],generalVariable(X),[')'].
@@ -183,7 +184,8 @@ identificator(X)--> (id(X)|function(X)).
 
 function(funct(Nom,Vars))--> variable(Nom),['('], params(Vars),[')'].
 
-params([V|R]) --> generalVariable(V),!,params2(R).
+params([])-->[].
+params([V|R]) --> generalVariable(V),params2(R).
 params2([V|R])--> [','] , generalVariable(V),!,params2(R).
 params2([])-->[].
 

@@ -66,7 +66,7 @@ allFile('/*
     Asuma archivo se llama Demo1.no
   */
   
-  val <int> x = "666"
+  val <int> x = "\""
   val < int -> int > abs = x -> x if x >= 0 else x
   
   method <int -> int > fact(n) = 1 if n == 0 else n //* fact(n - 1)
@@ -83,7 +83,7 @@ allFile('/*
 simpleTest('
     var <int -> double > foo 
     val <float -> int> goo = x -> x+5
-    val <int> x = "666"
+    val <int> x = "\\"66"
     val < int -> int > abs = x -> x if x >= 0 else x
     method <int -> int > fact(n) = 1 if n == 0 else n
     main{

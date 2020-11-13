@@ -83,8 +83,8 @@ finishNumber(Input, Partial, Token, Rest) :- finishToken(Input, isDigit, Partial
 finishId(Input, Partial, Token, Rest) :- finishToken(Input, isLetterOrDigit, Partial, Token, Rest)
 .
 % DOUBLE QUOTE
-finishQuote([C | Input], Partial, Token, Input) :- isQuote(C), !,
-                                                   convertToAtom([C | Partial], Token) 
+finishQuote([C | Input],[Q|Partial], Token, Input) :- Q\=='\\',isQuote(C), !,
+                                                   convertToAtom([C,Q | Partial], Token) 
 .
 finishQuote([C | Input], Partial, Token, Rest) :- finishQuote(Input, [C |Partial], Token, Rest)
 .

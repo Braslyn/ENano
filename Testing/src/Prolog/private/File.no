@@ -1,14 +1,1 @@
-
-    var <int -> double > foo 
-    val <float -> int> goo = x -> x+5
-    val <int> x = "\"66"
-    val < int -> int > abs = x -> x if x >= 0 else x
-    method <int -> int > fact(n) = 1 if n == 0 else n
-    main{
-       if(x>10)
-        var <float> k = 6
-        val < [ int ] > list = [1, -2, 3, x + x]
-        println(fact(k))
-        println(String.format("",this.abs.apply(6)))
-
-    }
+public class main {}

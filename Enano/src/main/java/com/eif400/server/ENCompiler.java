@@ -106,7 +106,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	}
 	
 	public static class CompileHandler extends DefaultHandler{
-		String text;
+		static String text;
 		@Override
         public String getText() {
             return text;
@@ -135,11 +135,11 @@ public class ENCompiler extends RouterNanoHTTPD {
 		}
 		
 		String name="file";
-		
+		String absoluteroute="";
 		try{
 			//hay que encontrar el nombre de la clase
 			
-			Pattern pattern = Pattern.compile("class (\\w+) ((\\w+)| )*\\{");
+			Pattern pattern = Pattern.compile("class ([a-zA-Z_][\\w]+)");
 			Matcher matcher = pattern.matcher(text);
 			if(matcher.find()){
 				name = matcher.group(1);
@@ -188,24 +188,28 @@ public class ENCompiler extends RouterNanoHTTPD {
 		  System.err.format("%s%n", e);
 		  System.exit(-1);
 		}
-		// Report diagnostics - adaptados para retonar json
+		// Report diagnostics - adaptados para retonar json	
 		text="";
 		if (diagsCollector.getDiagnostics().size() == 0){
-			text="*** No errors found ***";
+			absoluteroute = file.getAbsolutePath();
+			absoluteroute=absoluteroute.replace(file.getName(),"");
+			var child= Runtime.getRuntime().exec("cmd /c cd"+absoluteroute+" cd.. java -cp classes "+name+".class");
+			
 			file.delete();
 			//------------------------------------------------------------
-			text=String.format("{\"result\":\"%s\"}",text);
+			text=String.format("{\"result\":\"%s\"}",absoluteroute);
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
 		}
 		var texto=diagsCollector.getDiagnostics().stream().
-								reduce(new StringBuffer(),(stbff,line)=> stbff.append("Line: "+line.getLineNumber()+
-								stbff.append(d.getMessage( locale.ENGLISH ).replaceAll("\n"," "))));	
+								reduce( new StringBuffer(),(stbff,line) -> stbff.append("Line: "+line.getLineNumber()+
+								line.getMessage( locale.ENGLISH ).replaceAll("\n","\\n")),(x,y)->x);	
 		file.delete();
 		//------------------------------------------------------------
+		text=String.format("{\"result\":\"%s\"}",texto.toString());
 		ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
-		Response response = newFixedLengthResponse(getStatus(), getMimeType(), texto, texto.getBytes().length);
+		Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 		return response;
         }
 	}

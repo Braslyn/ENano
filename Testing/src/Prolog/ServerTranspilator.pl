@@ -45,7 +45,7 @@ http_parameters(Request,[text(Text)],
 
 
 post(Text,Reply) :- save_text('./private/File.no', Text),
-        parse('./private/File.no',Result),write(Result),
+        %parse('./private/File.no',Result),write(Result),
         http_post('http://localhost:9090/compile', 
                   atom('text/plain;charset=utf-8', Text), 
                   Reply,
@@ -66,7 +66,7 @@ allFile('/*
     Asuma archivo se llama Demo1.no
   */
   
-  val <int> x = "\""
+  val <int> x = "66"
   val < int -> int > abs = x -> x if x >= 0 else x
   
   method <int -> int > fact(n) = 1 if n == 0 else n //* fact(n - 1)
@@ -105,7 +105,7 @@ simpleTest2('val < double > PI = 3.14
     main {}').
 
 
-
+file('public class main {}').
 
 
 %probar ?- post('texto en general',Json). 

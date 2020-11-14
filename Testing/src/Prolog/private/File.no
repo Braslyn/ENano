@@ -1,1 +1,7 @@
-public class main {}
+class Simple{  
+        public static void main(String args[]){  
+         int x = 10;
+         int y = 90;
+         System.out.println(x*y);  
+        }  
+    }  

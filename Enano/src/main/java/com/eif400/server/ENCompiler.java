@@ -130,35 +130,35 @@ public class ENCompiler extends RouterNanoHTTPD {
 			try{
 			session.getInputStream().read( buf, 0, contentLength );
 			text=String.format("%s",new String(buf,StandardCharsets.UTF_8));
-		}catch(Exception e){
-			text="Fallo";
-		}
+			}catch(Exception e){
+				text="Fallo";
+			}
 		
-		String name="file";
-		String absoluteroute="";
-		try{
-			//hay que encontrar el nombre de la clase
-			
-			Pattern pattern = Pattern.compile("class ([a-zA-Z_][\\w]+)");
-			Matcher matcher = pattern.matcher(text);
-			if(matcher.find()){
-				name = matcher.group(1);
+			String name="file";
+			String absoluteroute="";
+			try{
+				//hay que encontrar el nombre de la clase
+				
+				Pattern pattern = Pattern.compile("class ([a-zA-Z_][\\w]+)");
+				Matcher matcher = pattern.matcher(text);
+				if(matcher.find()){
+					name = matcher.group(1);
+				}
+				
+				//se crea el archivo y se escribe en él.
+				file = new File(name+".java");
+				if (file.createNewFile()) {
+					FileWriter myWriter = new FileWriter(name+".java");
+					myWriter.write(text);
+					myWriter.close();
+				} else {
+					FileWriter myWriter = new FileWriter(name+".java");
+					myWriter.write(text);
+					myWriter.close();
+				}
+			}catch(Exception e){
+				
 			}
-			
-		//se crea el archivo y se escribe en él.
-			file = new File(name+".java");
-			if (file.createNewFile()) {
-				FileWriter myWriter = new FileWriter(name+".java");
-				myWriter.write(text);
-				myWriter.close();
-			} else {
-				FileWriter myWriter = new FileWriter(name+".java");
-				myWriter.write(text);
-				myWriter.close();
-			}
-		}catch(Exception e){
-			
-		}
 			//------------------------------------------------------------
 		text="";
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -193,27 +193,20 @@ public class ENCompiler extends RouterNanoHTTPD {
 		if (diagsCollector.getDiagnostics().size() == 0){
 			absoluteroute = file.getAbsolutePath();
 			absoluteroute=absoluteroute.replace(file.getName(),"");
-			//var child= Runtime.getRuntime().exec(new String[]{"cmd /c cd "+absoluteroute,"java -cp classes "+name+".class"});
 			try{
-				ProcessBuilder builder = new ProcessBuilder(
-				"cmd.exe", "/k", "cd "+absoluteroute,"dir /b");//"java -cp classes "+name+".class"
-				builder.redirectErrorStream(true);
-				Process p = builder.start();
-				BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				String aux;
-				while((aux=r.readLine()+"\\n")!=null)
-					text+=aux;
-				text=String.format("{\"result\":\"%s\"}",text);
-			}catch(Exception e){}
-			file.delete();
+				var child= Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1");//& java -cp classes "+name+".class
+				file.delete();
+				text=Files.lines(Paths.get("solv.txt")).reduce("",(x,y)->x+y+"\\n");
+			}catch(Exception e){ text=e.getMessage();}
 			//------------------------------------------------------------
-			
+			text=String.format("{\"result\":\"%s\"}",text);
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
 		}
+		//Errores
 		var texto=diagsCollector.getDiagnostics().stream().
-								reduce( new StringBuffer(),(stbff,line) -> stbff.append("Line: "+line.getLineNumber()+
+								reduce( new StringBuffer(),(stbff,line) -> stbff.append("Line: "+line.getLineNumber()+" -> "+
 								line.getMessage( locale.ENGLISH ).replaceAll("\n","\\n")),(x,y)->x);	
 		file.delete();
 		//------------------------------------------------------------
@@ -243,7 +236,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	public Response serve(IHTTPSession session){
 		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
 		String origin="*";
-		System.out.println(session.getHeaders().get("origin"));
+		//System.out.println(session.getHeaders());
 		/*boolean cors_allowed= request_header!=null && 
 								"cors".equals(request_header.get("sec-fetch-mode"))&&
 								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0

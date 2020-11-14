@@ -45,7 +45,7 @@ http_parameters(Request,[text(Text)],
 
 
 post(Text,Reply) :- save_text('./private/File.no', Text),
-        %parse('./private/File.no',Result),write(Result),
+        parse('./private/File.no',Result),!,write(Result),
         http_post('http://localhost:9090/compile', 
                   atom('text/plain;charset=utf-8', Text), 
                   Reply,
@@ -67,12 +67,13 @@ allFile('/*
   */
   
   val <int> x = "66"
+
   val < int -> int > abs = x -> x if x >= 0 else x
   
-  method <int -> int > fact(n) = 1 if n == 0 else n //* fact(n - 1)
+  method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
   
   main { // Main del programa
-     println(String.format("abs(%d)=%d", -x, this.abs.apply(x)))
+     println(String.format("abs(%d)=%d", -x, apply(x)))
      println(String.format("fact(%d)=%d", 5, fact(5)))
      val <int> x = 999 
      val < [ int ] > list = [1, -2, 3, x + x]
@@ -81,18 +82,17 @@ allFile('/*
 
 
 simpleTest('
-    var <int -> double > foo 
-    val <float -> int> goo = x -> x+5
-    val <int> x = "\\"66"
-    val < int -> int > abs = x -> x if x >= 0 else x
-    method <int -> int > fact(n) = 1 if n == 0 else n
+  val <int> x = "66"
+  
+  val < int -> int > abs = x -> x if x >= 0 else x
+  
+  method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
     main{
        if(x>10)
         var <float> k = 6
-        val < [ int ] > list = [1, -2, 3, x + x]
+        
         println(fact(k))
         println(String.format("",this.abs.apply(6)))
-
     }'). 
 
 
@@ -101,11 +101,18 @@ simpleTest2('val < double > PI = 3.14
     val < double > E = "2.718"
     var <int> x = x -> x+1
     val < double -> double > foo = 50
-    method <int -> int > fact(n) = 1 if n == 0 else n
-    main {}').
+    val < int -> int > abs = x -> x if x >= 0 else x
+    method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
+    main { 
+        println(fact(k))
+        val < [ int ] > list = [1, -2, 3, x + x]
+    }').
 
 
-file('public class main {}').
+file(' class Simple {  
+    public static void main(String args[]){  
+     System.out.println("Hello Java");  
+    }  }').
 
 
 %probar ?- post('texto en general',Json). 

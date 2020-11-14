@@ -87,20 +87,21 @@ lambda(lambda(X,body(N)))--> id(X) , ['->'] , variable(N).
 
 lambda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
 
-
-operation(oper(Oper,X,Y)) --> generalVariable(X) , operations(Oper), generalVariable(Y).
-operation(oper(Oper,X,Y)) --> operation(X), operations(Oper), generalVariable(Y).
-operation(oper(Oper,X,Y)) --> generalVariable(Y), operations(Oper), operation(X).  
-operation(oper(Oper,X,Y)) --> operation(X), operations(Oper), operation(Y).
+%modificar ----------------------------------------------------------------------------------------------
+operation(T)--> negationNumber(X),generalVariable(V),{build_tree(X,[' ',V],T)}.
+operation(T) --> generalVariable(X),operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
+operation(T) --> ['('], expr(T), [')'].
+operation([T]) --> generalVariable(T).
 %%%%%%%%%%%%%%%%%%%%%%%% if -- ternario %%%%%%%%%%%%%%%%%%%%%%%
 
 if(if(X,Body,Else)) --> [if], ['('],predicate(X) ,lines(Body),[')'], else(Else).
 else([]) --> [].
 else(Else)--> lines(Else).
 
-predicate(predicate(X,S,Se)) --> variable(S) , comparator(X) , variable(Se).
+predicate2(T)--> generalVariable(S) ,comparator(X), generalVariable(V),{build_tree(X,[S,V],T)}.
+predicate(T) --> predicate2(T).
 
-declarativeIf(dIf(X,N,Y)) --> generalVariable(X) , [if] , predicate(N) , [else], variable(Y).
+declarativeIf(dIf(X,N,Y)) --> operation(X) , [if] , predicate(N) , [else], operation(Y).
 
 %%%%%%%%%%%%%%%%%%%% numbers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 generalVariable(GV)-->(function(GV)|variable(GV)|sObjects(GV)). 
@@ -149,8 +150,8 @@ sformat(format(S,P)) --> ['String'],['.'],['format'],['('],vstring(S),[','],para
 
 
 %%%%%%%%%%%%%%%%%%%%%%% Println() %%%%%%%%%%%%%%%%%%%%%%%%%%
-
-println(print(X)) --> [println] , ['('],generalVariable(X),[')'].
+println(print(G))--> [println], ['('],generalVariable(G),[')'].
+println(print(X)) --> [println] , ['('],operation(X),[')'].
 println(print(M)) --> [println] , ['('],sObjects(M),[')'].
 println(print(F)) --> [println] , ['('],sformat(F),[')'].
 
@@ -170,15 +171,17 @@ line(L)--> println(L).
 
 line(L)--> sformat(L).
 
-%%%%%%%%%%%%%%%%%%%%%%%%% Comparator %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% Comparators & operators %%%%%%%%%%%%%%%%%%%%%%%%%
 comparator(X) --> [X],{isComparator(X)}.
 operations(X) --> [X],{isOperation(X)}.
+logic(X)-->[X],{isLogic(X)}.
 
-
+negationNumber('-') --> ['-'].
+not('!')-->['!'].
+isLogic(X):-member(X,['&&','||']).
 isComparator(X):- member(X,['>','<','==','!','<=','>=']),!.
-
 isOperation(X):- member(X,['+','-','*','/','**']),!.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 identificator(X)--> (id(X)|function(X)).
 
@@ -186,7 +189,9 @@ function(funct(Nom,Vars))--> variable(Nom),['('], params(Vars),[')'].
 
 params([])-->[].
 params([V|R]) --> generalVariable(V),params2(R).
+params([V,R]) --> operation(V),params2(R).
 params2([V|R])--> [','] , generalVariable(V),!,params2(R).
+params2([V,R]) --> [','] ,operation(V),params2(R).
 params2([])-->[].
 
 id(S)-->[S],{!,valid_id(S)}.%ok

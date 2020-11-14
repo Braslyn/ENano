@@ -16,7 +16,7 @@ since: 2020
 :- use_module(library(http/http_cors)).
 :- use_module(library(http/http_client)).
 :- use_module(library(http/http_json)).
-:- use_module('./NanoParser/parser', [parseNanoFile/2 as parse
+:- use_module('./NanoTranspiler/NanoTranspiler', [transpileExprStream/2 as transpile
                  ]).
 
 
@@ -45,7 +45,7 @@ http_parameters(Request,[text(Text)],
 
 
 post(Text,Reply) :- save_text('./private/File.no', Text),
-        parse('./private/File.no',Result),!,write(Result),
+        transpile('./private/File.no',Result),!,write(Result),
         http_post('http://localhost:9090/compile', 
                   atom('text/plain;charset=utf-8', Text), 
                   Reply,
@@ -73,7 +73,7 @@ allFile('/*
   method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
   
   main { // Main del programa
-     println(String.format("abs(%d)=%d", -x, apply(x)))
+     println(String.format("abs(%d)=%d", -x, this.abs.apply(x) ) )
      println(String.format("fact(%d)=%d", 5, fact(5)))
      val <int> x = 999 
      val < [ int ] > list = [1, -2, 3, x + x]

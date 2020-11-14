@@ -187,11 +187,15 @@ identificator(X)--> (id(X)|function(X)).
 
 function(funct(Nom,Vars))--> variable(Nom),['('], params(Vars),[')'].
 
-params([])-->[].
+params([V|R]) --> operation(V),params2(R).
 params([V|R]) --> generalVariable(V),params2(R).
-params([V,R]) --> operation(V),params2(R).
+params(V) --> operation(V).
+params(V) --> generalVariable(V).
+params([])-->[].
+params2([V|R]) --> [','] ,operation(V),params2(R).
 params2([V|R])--> [','] , generalVariable(V),!,params2(R).
-params2([V,R]) --> [','] ,operation(V),params2(R).
+params2(V)-->generalVariable(V).
+params2(V)-->operation(V).
 params2([])-->[].
 
 id(S)-->[S],{!,valid_id(S)}.%ok

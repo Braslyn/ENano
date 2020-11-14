@@ -193,11 +193,21 @@ public class ENCompiler extends RouterNanoHTTPD {
 		if (diagsCollector.getDiagnostics().size() == 0){
 			absoluteroute = file.getAbsolutePath();
 			absoluteroute=absoluteroute.replace(file.getName(),"");
-			var child= Runtime.getRuntime().exec("cmd /c cd"+absoluteroute+" cd.. java -cp classes "+name+".class");
-			
+			//var child= Runtime.getRuntime().exec(new String[]{"cmd /c cd "+absoluteroute,"java -cp classes "+name+".class"});
+			try{
+				ProcessBuilder builder = new ProcessBuilder(
+				"cmd.exe", "/k", "cd "+absoluteroute,"dir /b");//"java -cp classes "+name+".class"
+				builder.redirectErrorStream(true);
+				Process p = builder.start();
+				BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				String aux;
+				while((aux=r.readLine()+"\\n")!=null)
+					text+=aux;
+				text=String.format("{\"result\":\"%s\"}",text);
+			}catch(Exception e){}
 			file.delete();
 			//------------------------------------------------------------
-			text=String.format("{\"result\":\"%s\"}",absoluteroute);
+			
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;

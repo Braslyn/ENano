@@ -30,6 +30,9 @@ import static fi.iki.elonen.NanoHTTPD.SOCKET_READ_TIMEOUT;
 import fi.iki.elonen.router.RouterNanoHTTPD.DefaultHandler;
 import fi.iki.elonen.router.RouterNanoHTTPD.IndexHandler;
 
+import fi.iki.elonen.router.RouterNanoHTTPD.UriResource;
+import fi.iki.elonen.router.RouterNanoHTTPD.UriResponder;
+
 import java.util.logging.Level; 
 import java.util.logging.Logger;
 
@@ -216,7 +219,74 @@ public class ENCompiler extends RouterNanoHTTPD {
 		return response;
         }
 	}
-	
+	public static class NameHandler extends DefaultHandler{
+		final Pattern Getline = Pattern.compile("(\\w+): ([a-zA-Z| -.:\\/|[0-9]+]*)");
+		String text;
+		@Override
+        public String getText() {
+            return text;
+        }
+        @Override
+        public String getMimeType() {
+            return "application/json";
+        }
+     
+        @Override
+        public Response.IStatus getStatus() {
+            return Response.Status.OK;
+        }
+		private String Json(Matcher matcher){
+			matcher.find();
+			return String.format("\"%s\":\"%s\"",matcher.group(1),matcher.group(2));	
+		}
+			
+		@Override//devuelve el JSON con la info
+		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
+            //Lee del archivo
+			
+			try{
+				String test=urlParams.get("Name");
+				// for (Map.Entry<String, String> entry : urlParams.entrySet()) {
+				// 	String key = entry.getKey();
+				// 	String value = entry.getValue();
+				// 	test = value;
+				// 	//emc hacer que solo lea uno o el de name 
+				// }				 
+				String filePathString = Paths.get("./classes/"+test+".class").toString();
+				File f = new File(filePathString);
+				if(f.exists() && !f.isDirectory()) { 
+					// do something
+					text="{\"exist\":true";
+				}
+				else{
+					text="{\"exist\":false";
+				}
+				
+				
+				// File dir = new File(Paths.get("./classes/").toString());
+				// FilenameFilter filter = new FilenameFilter() {
+				//    public boolean accept (File dir, String name) { 
+				// 	  return name.startsWith(test);
+				//    } 
+				// }; 
+				// String[] children = dir.list(filter);
+				// if (children == null) {
+				// 	text="{\"exist\":false";
+				//  } else { 
+				// 	text="{\"exist\":true"+clase;
+				// 	} 
+
+			}catch(Exception ex){
+				text="{\"result\":\""+ex.getMessage()+"\"";
+			}
+			text+="}";
+			
+			//Posible Cliente de DB
+            ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+			return response;
+        }
+	}
 	public ENCompiler(int port) throws IOException {
         super(port);
         addMappings();
@@ -228,6 +298,7 @@ public class ENCompiler extends RouterNanoHTTPD {
     public void addMappings() {
         addRoute("/compile", CompileHandler.class);
 		addRoute("/info", InfoHandler.class);
+		addRoute("/name/:Name", NameHandler.class);
     }
 	
 	

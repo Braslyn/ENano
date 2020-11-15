@@ -23,7 +23,7 @@ transpileExprFile(ExprFile, OutFile):-
    transpileExprStream(ExprFile, OutStream) 
 .
 transpileExprStream(ExprFile, OutStream) :- 
-    parse(ExprFile, Tree),!,
+    parse(ExprFile, Tree),write(Tree),!,
     transpileNano(Tree,OutStream),write(OutStream)
 .
 
@@ -69,15 +69,27 @@ dbody(lambda(Id,body(B)),R):- format(atom(R),'= ~s -> ~q',[Id,B]).
 dbody(X,R):- format(atom(R),'= ~s',[X]).
 
 params([],'','').
-params([F|R],Acc,Result):-format(atom(R1),'~s~q',[Acc,F]), params2(R,R1,Result).
+params([F|R],Acc,Result):- object(F,L) ,format(atom(R1),'~s~q',[Acc,L]), params2(R,R1,Result).
+params([F|R],Acc,Result):- format(atom(R1),'~s~q',[Acc,F]), params2(R,R1,Result).
 params2([],Acc,Acc).
+params2([F|R],Acc,Result):- object(F,L) ,format(atom(R1),'~s~q',[Acc,L]), params2(R,R1,Result).
 params2([F|R],Acc,Result):- format(atom(R1),'~s,~q',[Acc,F]),params2(R,R1,Result).
 
 blines([],Acc,Acc).
 blines([F|R],Acc,Result):- line(F,N),format(atom(R1),'~s \n ~s',[Acc,N]),blines(R,R1,Result).
 
 
-line(print(X),R):-format(atom(R),'System.out.println(~s);',[X]).
+line(X,R):- print(X,R).
+
+print(print(format(String,Param)),R):- params(Param,'',P) ,format(atom(R),'System.out.println(~q,~s);',[String,P]).
+print(print(format(String,Param)),R):- params(Param,'',P), format(atom(R),'System.out.println(~q,~s);',[String,P]).
+print(print(funct(Id,Param)),R):- params(Param,'',P) , format(atom(R),'System.out.println(~s(~s));',[Id,P]).
+print(print(X),R):- format(atom(R),'System.out.println(~s);',[X]).
+
+
+funct(funct(Id,Param),R):- params(Param,'',P),format(atom(R),'~s(~s);',[Id,P]).
+object(obj(Id,funct(Funct,Param)),R):- params(Param,'',P) ,format(atom(R),'this.~s.~s(~s);',[Id,Funct,P]).
+
 /*
    dIf([1],n==0,[funct(fact,[n-1])]))])
    dec(val,type(arrow(int,int)),abs,lambda(x,body(dIf([x],x>=0,[x]))))

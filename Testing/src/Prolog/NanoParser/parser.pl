@@ -89,12 +89,13 @@ lambda(lambda(X,body(N)))--> id(X) , ['->'] , variable(N).
 lambda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
 
 %modificar ----------------------------------------------------------------------------------------------
+operation(T)--> sObjects(T).
 operation(T)--> function(T).
-operation(T)--> negationNumber(X),generalVariable(K),{(atom_number(K,V)|V=K),unary_tree(X,V,T)}.
-operation(T) --> generalVariable(K),{(atom_number(K,X)|X=K)},operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
+operation(T)--> negationNumber(X),generalVariable(K),{write(K),(atom(K)->atom_number(K,V));V=K,unary_tree(X,V,T)}.
+operation(T) --> generalVariable(K),{( atom(K) -> atom_number(K,X) );X=K},operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
 operation(T) --> ['('], operation(T), [')'].
 operation(T),[')'] --> generalVariable(T),[')'].
-operation([T]) --> generalVariable(X),{(atom_number(X,T)|T=X)}.
+operation([T]) --> generalVariable(X),{(atom(X)->atom_number(X,T));T=X}.
 %%%%%%%%%%%%%%%%%%%%%%%% if -- ternario %%%%%%%%%%%%%%%%%%%%%%%
 
 if(if(X,Body,Else)) --> [if], ['('],predicate(X),[')'],['{'],lines(Body),['}'], else(Else).
@@ -113,7 +114,7 @@ generalVariable(GV)-->(function(GV)|variable(GV)|sObjects(GV)).
 variable(V)-->(id(V)|numbs(V)|vstring(V)),!.
 
 
-numbs(N) --> (snum(X)|num(X)),{atomic_list_concat(X, N)}. %ok
+numbs(N) --> (snum(X)|num(X)),{atomic_list_concat(X, C),atom_number(C,N)}. %ok
 
 
 num([N|Next])--> digits(N),!,anum(Next). %ok          1.xxxx
@@ -154,12 +155,11 @@ sformat(format(S,P)) --> ['String'],['.'],['format'],['('],vstring(S),[','],para
 
 
 %%%%%%%%%%%%%%%%%%%%%%% Println() %%%%%%%%%%%%%%%%%%%%%%%%%%
-println(print(G))--> [println], ['('],generalVariable(G),[')'].
-println(print(X)) --> [println] , ['('],operation(X),[')'].
-println(print(M)) --> [println] , ['('],sObjects(M),[')'].
 println(print(F)) --> [println] , ['('],sformat(F),[')'].
-
-%%%%%%%%%%%%%%%%%%%% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+println(print(M)) --> [println] , ['('],sObjects(M),[')'].
+println(print(G))-->  [println],  ['('],generalVariable(G),[')'].
+println(print(X)) --> [println] , ['('],operation(X),[')'].
+%%%%%%%%%%%%%%%%%%%%%%%% Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 lines([])-->[].
 

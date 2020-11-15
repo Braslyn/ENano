@@ -90,9 +90,8 @@ simpleTest('
     main{
        if(x>10)
         var <float> k = 6
-        
-        println(fact(k))
-        println(String.format("",this.abs.apply(6)))
+        //println(fact(k))
+        println(String.format("fact(%d)=%d", 5, fact(5)))
     }'). 
 
 
@@ -103,7 +102,7 @@ simpleTest2('val < double > PI = 3.14
     val < int -> int > abs = x -> x if x >= 0 else -1
     method <int -> int > fact(n) = 1 if n == 0 else fact(n-1)
     main {
-        println("esa wea")
+        println("sxxs")
     }').
 
 

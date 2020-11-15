@@ -1,7 +1,7 @@
 /*
   loriacarlos@gmail.com
   II-2020
-  
+  modify by Braslyn Rodriguez Ramirez 402420750
 */
 
 :- module(parser, [ parseNanoFile/2,
@@ -71,7 +71,7 @@ expresion([])-->[],!.
 vstring(X) --> [X],{isString(X)}.
 %%%%%%%%%%%%%%%%%%%%%%%%% list exp %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-list(L)--> ['['], listBody(L) ,[']'].
+list(list(L))--> ['['], listBody(L) ,[']'].
 listBody(body([V|R])) --> (generalVariable(V)|operation(V)), listBody2(R).
 listBody([])--> [],!.
 listBody2([V|R]) --> [','], (generalVariable(V)|operation(V)),listBody2(R). 

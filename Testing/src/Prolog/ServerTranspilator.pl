@@ -99,8 +99,10 @@ simpleTest2('val < double > PI = 3.14
     var <String> name = "Brazza"
     val <int -> int > func = x -> x*x
     val < int -> int > abs = x -> x if x >= 0 else x
+    var < [int] > L
     method <int -> int > fact(n) = 1 if n == 0 else n*fact(n-1)
     main {
+        var <int> k = 6
         println(fact(5))
     }').
 

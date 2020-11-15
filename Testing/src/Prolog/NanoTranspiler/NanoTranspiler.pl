@@ -30,14 +30,15 @@ transpileExprStream(ExprFile, OutStream) :-
 %%%%%%%%%%%%%%%%%%%%%%% import manage %%%%%%%%%%%%%%%%
 :-dynamic imports/1.
 :-dynamic unary/1.
-
+:-dynamic implist/1.
 
 unarImport:- (retract(unary(X)),assert(unary(X)),X==fail) -> (retract(unary(_)),assert(unary(true)),retract(imports(R)),format(atom(F),'~simport java.util.function.UnaryOperator;\n',[R])
 ,assert(imports(F))).
 
-listImport:- fail.
+listImport:- (retract(implist(X)),assert(implist(X)),X==fail) -> (retract(implist(_)),assert(implist(true)),retract(imports(R)),format(atom(F),'~simport java.util.ArrayList;\n',[R])
+,assert(imports(F))).
 
-initImports:- retractall(unary(_)),retractall(imports(_)),assert(imports('')),assert(unary(fail)).
+initImports:- retractall(unary(_)),retractall(imports(_)),retractall(implist(_)),assert(imports('')),assert(unary(fail)),assert(implist(fail)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Transpile Init %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,8 +61,9 @@ declare(dec(val,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R
 declare(dec(var,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R),'~s ~s ~s; ',[Ty,Id,R1]).
 %dec(method, type( arrow(int,int) ) , funct( fact,[n] ) , dIf( [1],n==0,funct(f,[n-1] ) ) )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% type for declaration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-dtype(type(arrow(X,X)),R):- changeInt(X,Y),format(atom(R),'UnaryOperator<~s>',[Y]), (unarImport;true).
+dtype(type(arrow(X,X)),R):- changeType(X,Y),format(atom(R),'UnaryOperator<~s>',[Y]), (unarImport;true).
 dtype(type(arrow(X,Y)),R):- format(atom(R),'BinaryOperator<~s,~s>',[X,Y]).
+dtype(type(list(X)),R):- changeType(X,Y), format(atom(R),'List<~s> ',[Y]),(listImport;true).
 dtype(type(Type),Type).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%method body %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %mbody(dIf([F],P,B),R):- params(Param,'',P2) , format(atom(R),'{ return ( ~q )? ~q : ~q(~s); }',[P,F,Funct,P2]).
@@ -70,11 +72,12 @@ mbody(dIf([F],P,B),R):- simplify(B,B1),format(atom(R),'{ return ( ~q )? ~q : ~s;
 dtype2(type(arrow(_,Y)),Y).
 paramtype(type(arrow(X,_)),X).
 %%%%%%%%%%%%%%%%%%%%%%%%%% change types %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-changeInt(X,Y):- (X==int -> Y='Integer');Y=X.
+changeType(X,Y):- (X==int -> Y='Integer');Y=X.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% declaration Body %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dbody([],' ').
 dbody(lambda(Id,body(dIf([F],P,[B]))),R):-simplify(B,B1), format(atom(R),'= ~s -> ( ~q )? ~q : ~s',[Id,P,F,B1]).
 dbody(lambda(Id,body(B)),R):- simplify(B,B1) ,format(atom(R),'= ~s -> ~s',[Id,B1]).
+dbody(list(body(X)),R):- params(X,'',L),format(atom(R),'= Arrays.asList(~s)',[L]).
 dbody(X,R):- atom(X),format(atom(R),'= ~s',[X]).
 dbody(X,R):- format(atom(R),'= ~q',[X]).
 
@@ -92,7 +95,7 @@ blines([],Acc,Acc).
 blines([F|R],Acc,Result):- line(F,N),format(atom(R1),'~s \n ~s',[Acc,N]),blines(R,R1,Result).
 
 
-%line(X,R):-declare(D,R).
+line(X,R):-declare(X,R).
 line(X,R):- print(X,R).
 
 %%%%%%%%%%%%%%%%%%%% Trees simplify %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -104,8 +107,8 @@ simplify(V,T):- V=..[Oper,X,Y], simplify(X,X1),simplify(Y,Y1),format(atom(T),'~s
 
 
 %%%%%%%%%%%%%%%%%%%% Print statment %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-print(print(format(String,Param)),R):- params(Param,'',P) ,format(atom(R),'System.out.println(~q,~s);',[String,P]).
-print(print(format(String,Param)),R):- params(Param,'',P), format(atom(R),'System.out.println(~q,~s);',[String,P]).
+print(print(format(String,Param)),R):- params(Param,'',P) ,format(atom(R),'System.out.println(~s,~s);',[String,P]).
+print(print(format(String,Param)),R):- params(Param,'',P), format(atom(R),'System.out.println(~s,~s);',[String,P]).
 print(print(funct(Id,Param)),R):- params(Param,'',P) , format(atom(R),'System.out.println(~s(~s));',[Id,P]).
 print(print(X),R):- atom(X),format(atom(R),'System.out.println(~s);',[X]).
 print(print(X),R):- format(atom(R),'System.out.println(~q);',[X]).

@@ -18,7 +18,8 @@
 parseNanoFile(File, Tree) :-
    tokenize(File, Tokens),parseNanoTokens(Tokens, Tree ).
 
-parseNanoTokens(Tokens, Tree) :- nanoFile(Tree,Tokens,[]).
+parseNanoTokens(Tokens, Tree) :- nanoFile(Tree,Tokens,[])
+.
 
 
 parseNanoAtom(Atom, Tree) :-
@@ -88,15 +89,18 @@ lambda(lambda(X,body(N)))--> id(X) , ['->'] , variable(N).
 lambda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
 
 %modificar ----------------------------------------------------------------------------------------------
+operation(T)--> function(T).
 operation(T)--> negationNumber(X),generalVariable(K),{(atom_number(K,V)|V=K),unary_tree(X,V,T)}.
 operation(T) --> generalVariable(K),{(atom_number(K,X)|X=K)},operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
 operation(T) --> ['('], operation(T), [')'].
+operation(T),[')'] --> generalVariable(T),[')'].
 operation([T]) --> generalVariable(X),{(atom_number(X,T)|T=X)}.
 %%%%%%%%%%%%%%%%%%%%%%%% if -- ternario %%%%%%%%%%%%%%%%%%%%%%%
 
-if(if(X,Body,Else)) --> [if], ['('],predicate(X) ,lines(Body),[')'], else(Else).
+if(if(X,Body,Else)) --> [if], ['('],predicate(X),[')'],['{'],lines(Body),['}'], else(Else).
 else([]) --> [].
-else(Else)--> lines(Else).
+else(elif(X,Body,Else))-->[elif], ['('],predicate(X),[')'],['{'],lines(Body),['}'],else(Else).
+else(Else)-->[else],['{'],lines(Else),['}'].
 
 predicate2(T)--> generalVariable(J),{(atom_number(J,S)|S=J)},comparator(X), generalVariable(K),{(atom_number(K,V)|V=K),build_tree(X,[S,V],T)}.
 predicate(T) --> predicate2(T).

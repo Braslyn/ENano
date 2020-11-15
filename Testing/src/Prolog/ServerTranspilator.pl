@@ -101,8 +101,10 @@ simpleTest2('val < double > PI = 3.14
     var <String> name = "Brazza"
     val <int -> int > func = x -> x*x
     val < int -> int > abs = x -> x if x >= 0 else -1
-    method <int -> int > fact(n) = 1 if n == 0 else f(n-1)
-    main {}').
+    method <int -> int > fact(n) = 1 if n == 0 else fact(n-1)
+    main {
+        println("esa wea")
+    }').
 
 
 file(' ').

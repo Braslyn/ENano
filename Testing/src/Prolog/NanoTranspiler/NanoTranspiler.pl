@@ -27,44 +27,57 @@ transpileExprStream(ExprFile, OutStream) :-
     transpileNano(Tree,OutStream),write(OutStream)
 .
 
-transpileNano(nanoProgram(Declare,Main),Java):- C='public class Simple{~s 
-   public static void main(String args[]){  
-   ~s
-   }
-}  ',transpileprogram(Declare,Main,Decs,Lines) , format(atom(Java),C,[Decs,Lines]).
+:-dynamic imports/1.
+:-dynamic unary/1.
 
-transpileprogram(declars(List1),main(List2),R1,R2):- dLines(List1,' ',R1),lines(List2,R2).
 
-dLines([F|R],Acc,Result):- declare(F,Re1), format(atom(X),'~s \n ~s;',[Acc,Re1]) , dLines(R,X,Result).
+unarImport:- (retract(unary(X)),assert(unary(X)),X==fail) -> (retract(unary(_)),assert(unary(true)),retract(imports(R)),format(atom(F),'~simport java.util.function.UnaryOperator;\n',[R])
+,assert(imports(F))).
+
+initImports:- retractall(unary(_)),retractall(imports(_)),assert(imports('')),assert(unary(fail)).
+
+transpileNano(nanoProgram(Declare,Main),Java):- initImports ,C='public class Simple {~s
+   public static void main(String args[]){~s
+   }}',
+transpileprogram(Declare,Main,Decs,Lines) , format(atom(Class),C,[Decs,Lines]),retract(imports(Imports)),format(atom(Java),'~s ~s',[Imports,Class]).
+
+transpileprogram(declars(List1),main(List2),R1,R2):- dLines(List1,'',R1),blines(List2,'',R2).
+
+dLines([F|R],Acc,Result):- declare(F,Re1), format(atom(X),'~s \n ~s',[Acc,Re1]) , dLines(R,X,Result).
 dLines([],R1,R):-format(atom(R),'~s',[R1]).
 
 
-declare(dec(method,Type,funct(Id,Param),Body),R ):- mbody(Body,R1),dtype2(Type,Ty),params(Param,'',P),format(atom(R),'~s ~s(~s) ~s',[Ty,Id,P,R1]).
-declare(dec(val,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R),'final ~s ~s ~s',[Ty,Id,R1]).
-declare(dec(var,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R),'~s ~s ~s',[Ty,Id,R1]).
+declare(dec(method,Type,funct(Id,Param),Body),R ):- mbody(Body,R1),dtype2(Type,Ty),paramtype(Type,TP),params(Param,'',P),format(atom(R),'~s ~s(~s ~s) ~s',[Ty,Id,TP,P,R1]).
+declare(dec(val,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R),'final ~s ~s ~s; ',[Ty,Id,R1]).
+declare(dec(var,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R),'~s ~s ~s; ',[Ty,Id,R1]).
 %dec(method, type( arrow(int,int) ) , funct( fact,[n] ) , dIf( [1],n==0,funct(f,[n-1] ) ) )
 
-params([],'','').
-params([F|R],Acc,Result):-format(atom(R1),'~s ~s',[Acc,F]), params2(R,R1,Result).
-params2([],Acc,Acc).
-params2([F|R],Acc,Result):- format(atom(R1),'~s,~s',[Acc,F]),params2(R,R1,Result).
-
-dtype(type(arrow(X,X)),R):- format(atom(R),'UnaryOperator<~s>',[X]).
+dtype(type(arrow(X,X)),R):- changeInt(X,Y),format(atom(R),'UnaryOperator<~s>',[Y]), (unarImport;true).
 dtype(type(arrow(X,Y)),R):- format(atom(R),'BinaryOperator<~s,~s>',[X,Y]).
 dtype(type(Type),R):- format(atom(R),'~s',[Type]).
 
+mbody(dIf([F],P,funct(Funct,Param)),R):- params(Param,'',P2) , format(atom(R),'{ return ( ~q )? ~q : ~q(~s); }',[P,F,Funct,P2]).
 mbody(dIf([F],P,B),R):- format(atom(R),'{ return ( ~q )? ~q : ~q; }',[P,F,B]).
 dtype2(type(arrow(_,Y)),Y).
+paramtype(type(arrow(X,_)),X).
+
+changeInt(X,Y):- (X==int -> Y='Integer');Y=X.
 
 dbody([],' ').
 dbody(lambda(Id,body(dIf([F],P,B))),R):- format(atom(R),'= ~s -> ( ~q )? ~q : ~q',[Id,P,F,B]).
 dbody(lambda(Id,body(B)),R):- format(atom(R),'= ~s -> ~q',[Id,B]).
 dbody(X,R):- format(atom(R),'= ~s',[X]).
 
+params([],'','').
+params([F|R],Acc,Result):-format(atom(R1),'~s~q',[Acc,F]), params2(R,R1,Result).
+params2([],Acc,Acc).
+params2([F|R],Acc,Result):- format(atom(R1),'~s,~q',[Acc,F]),params2(R,R1,Result).
 
-%lines([F|R],Result):- lines(D,Result).
-lines([],' ').
+blines([],Acc,Acc).
+blines([F|R],Acc,Result):- line(F,N),format(atom(R1),'~s \n ~s',[Acc,N]),blines(R,R1,Result).
 
+
+line(print(X),R):-format(atom(R),'System.out.println(~s);',[X]).
 /*
    dIf([1],n==0,[funct(fact,[n-1])]))])
    dec(val,type(arrow(int,int)),abs,lambda(x,body(dIf([x],x>=0,[x]))))

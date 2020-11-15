@@ -35,7 +35,7 @@ parseExprStream(Stream, Tree) :-
 % declarationList -> Vela por la lista de declaraciones
 % main() vira porque que el main este correcto.
 
-nanoFile( nanoProgram(declars(L),main(M)) ) --> declarationList(L),main(M).
+nanoFile( nanoProgram(declars(L),M) ) --> declarationList(L),main(M).
 
 %%%%%%%%%%%% Delcarations %%%%%%%%%%%%%%%%
 declarationList([]) --> [].
@@ -52,7 +52,7 @@ type(S) --> [S],{basicType(S)}.%ok unit
 
 type(list(S)) --> ['['],[S],{basicType(S)},[']']. % List 
 
-basicType(S):- member(S,[int,string,float,double]),!. %%%%%%%%%%%%%%%%% types
+basicType(S):- member(S,[int,'String',float,double]),!. %%%%%%%%%%%%%%%%% types
 
 dekKeyword(S)-->[S],{member(S, [var,val,method])},{!}.%ok %%%%%%%%%%%% key words
 
@@ -88,17 +88,17 @@ lambda(lambda(X,body(N)))--> id(X) , ['->'] , variable(N).
 lambda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
 
 %modificar ----------------------------------------------------------------------------------------------
-operation(T)--> negationNumber(X),generalVariable(V),{build_tree(X,[' ',V],T)}.
-operation(T) --> generalVariable(X),operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
-operation(T) --> ['('], expr(T), [')'].
-operation([T]) --> generalVariable(T).
+operation(T)--> negationNumber(X),generalVariable(K),{(atom_number(K,V)|V=K),unary_tree(X,V,T)}.
+operation(T) --> generalVariable(K),{(atom_number(K,X)|X=K)},operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
+operation(T) --> ['('], operation(T), [')'].
+operation([T]) --> generalVariable(X),{(atom_number(X,T)|T=X)}.
 %%%%%%%%%%%%%%%%%%%%%%%% if -- ternario %%%%%%%%%%%%%%%%%%%%%%%
 
 if(if(X,Body,Else)) --> [if], ['('],predicate(X) ,lines(Body),[')'], else(Else).
 else([]) --> [].
 else(Else)--> lines(Else).
 
-predicate2(T)--> generalVariable(S) ,comparator(X), generalVariable(V),{build_tree(X,[S,V],T)}.
+predicate2(T)--> generalVariable(J),{(atom_number(J,S)|S=J)},comparator(X), generalVariable(K),{(atom_number(K,V)|V=K),build_tree(X,[S,V],T)}.
 predicate(T) --> predicate2(T).
 
 declarativeIf(dIf(X,N,Y)) --> operation(X) , [if] , predicate(N) , [else], operation(Y).
@@ -238,5 +238,6 @@ factorExpr(A) --> [A], {atomic(A), !}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Semantic Helpers %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 build_tree(_, [Left], Left).
 build_tree(Oper, [Left, Right], T) :- T =.. [Oper, Left, Right].
+unary_tree(Oper,One,T):- T=.. [Oper,One].
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

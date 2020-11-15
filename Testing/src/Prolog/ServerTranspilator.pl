@@ -68,7 +68,7 @@ allFile('/*
   
   val <int> x = "66"
 
-  val < int -> int > abs = x -> x if x >= 0 else x
+  val < int -> int > abs = x -> x if x >= 0 else -x
   
   method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
   
@@ -82,7 +82,7 @@ allFile('/*
 
 
 simpleTest('
-  val <int> x = "66"
+  val <int> x = x -> x+1
   
   val < int -> int > abs = x -> x if x >= 0 else x
   
@@ -97,8 +97,11 @@ simpleTest('
 
 
 
-simpleTest2('
-    val < double > PI = 3.14
+simpleTest2('val < double > PI = 3.14
+    var <String> name = "Brazza"
+    val <int -> int > func = x -> x*x
+    val < int -> int > abs = x -> x if x >= 0 else -1
+    method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
     main {}').
 
 

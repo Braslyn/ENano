@@ -45,9 +45,9 @@ http_parameters(Request,[text(Text)],
 
 
 post(Text,Reply) :- save_text('./private/File.no', Text),
-        transpile('./private/File.no',Result),!,write(Result),
+        transpile('./private/File.no',Result),!,
         http_post('http://localhost:9090/compile', 
-                  atom('text/plain;charset=utf-8', Text), 
+                  atom('text/plain;charset=utf-8', Result), 
                   Reply,
                   [method(post)]). 
 
@@ -97,22 +97,12 @@ simpleTest('
 
 
 
-simpleTest2('val < double > PI = 3.14
-    val < double > E = "2.718"
-    var <int> x = x -> x+1
-    val < double -> double > foo = 50
-    val < int -> int > abs = x -> x if x >= 0 else x
-    method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
-    main { 
-        println(fact(k))
-        val < [ int ] > list = [1, -2, 3, x + x]
-    }').
+simpleTest2('
+    val < double > PI = 3.14
+    main {}').
 
 
-file(' class Simple {  
-    public static void main(String args[]){  
-     System.out.println("Hello Java");  
-    }  }').
+file(' ').
 
 
 %probar ?- post('texto en general',Json). 

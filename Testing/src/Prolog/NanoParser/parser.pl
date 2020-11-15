@@ -91,11 +91,11 @@ lambda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
 %modificar ----------------------------------------------------------------------------------------------
 operation(T)--> sObjects(T).
 operation(T)--> function(T).
-operation(T)--> negationNumber(X),generalVariable(K),{write(K),(atom(K)->atom_number(K,V));V=K,unary_tree(X,V,T)}.
-operation(T) --> generalVariable(K),{( atom(K) -> atom_number(K,X) );X=K},operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
+operation(T)--> negationNumber(X),generalVariable(V),{unary_tree(X,V,T)}.
+operation(T) --> generalVariable(X),operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
 operation(T) --> ['('], operation(T), [')'].
 operation(T),[')'] --> generalVariable(T),[')'].
-operation([T]) --> generalVariable(X),{(atom(X)->atom_number(X,T));T=X}.
+operation([T]) --> generalVariable(T).
 %%%%%%%%%%%%%%%%%%%%%%%% if -- ternario %%%%%%%%%%%%%%%%%%%%%%%
 
 if(if(X,Body,Else)) --> [if], ['('],predicate(X),[')'],['{'],lines(Body),['}'], else(Else).
@@ -103,7 +103,7 @@ else([]) --> [].
 else(elif(X,Body,Else))-->[elif], ['('],predicate(X),[')'],['{'],lines(Body),['}'],else(Else).
 else(Else)-->[else],['{'],lines(Else),['}'].
 
-predicate2(T)--> generalVariable(J),{(atom_number(J,S)|S=J)},comparator(X), generalVariable(K),{(atom_number(K,V)|V=K),build_tree(X,[S,V],T)}.
+predicate2(T)--> generalVariable(J),{(atom_number(J,S)|S=J)},comparator(X), generalVariable(V),{build_tree(X,[S,V],T)}.
 predicate(T) --> predicate2(T).
 
 declarativeIf(dIf(X,N,Y)) --> operation(X) , [if] , predicate(N) , [else], operation(Y).

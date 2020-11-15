@@ -84,14 +84,13 @@ allFile('/*
 simpleTest('
   val <int> x = x -> x+1
   
-  val < int -> int > abs = x -> x if x >= 0 else x
+  val < int -> int > abs = x -> x if x >= 0 else 1
   
   method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
     main{
-       if(x>10)
-        var <float> k = 6
-        //println(fact(k))
-        println(String.format("fact(%d)=%d", 5, fact(5)))
+        var <int> k = 6
+        println(fact(k))
+        //println(String.format("fact(%d)=%d", 5, fact(5)))
     }'). 
 
 
@@ -99,10 +98,10 @@ simpleTest('
 simpleTest2('val < double > PI = 3.14
     var <String> name = "Brazza"
     val <int -> int > func = x -> x*x
-    val < int -> int > abs = x -> x if x >= 0 else -1
-    method <int -> int > fact(n) = 1 if n == 0 else fact(n-1)
+    val < int -> int > abs = x -> x if x >= 0 else x
+    method <int -> int > fact(n) = 1 if n == 0 else n*fact(n-1)
     main {
-        println("sxxs")
+        println(fact(5))
     }').
 
 

@@ -16,7 +16,7 @@ since: 2020
 :- use_module(library(http/http_cors)).
 :- use_module(library(http/http_client)).
 :- use_module(library(http/http_json)).
-:- use_module('./NanoTranspiler/NanoTranspiler', [transpileExprStream/2 as transpile
+:- use_module('./NanoTranspiler/NanoTranspiler', [transpileExprStream/3 as transpile
                  ]).
 
 
@@ -38,21 +38,23 @@ http_server(http_dispatch, [port(Port)]).
 
 
 transpile_handler(Request) :- cors_enable,
-http_parameters(Request,[text(Text)],
+http_parameters(Request,[name(Name),text(Text)],
          [attribute_declarations(param), 'application/x-www-form-urlencoded; charset=UTF-8']
-        ),post(Text,Json),reply_json(Json).
+        ),post(Text,Name,Json),reply_json_dict({result:Json}).
 
 
 
-post(Text,Reply) :- save_text('./private/File.no', Text),
-        transpile('./private/File.no',Result),!,
+post(Text,N,Result) :- format(atom(Name),'./private/~s.no',[N]), 
+        save_text(Name, Text),
+        transpile(Name,N,Result),!,
         http_post('http://localhost:9090/compile', 
                   atom('text/plain;charset=utf-8', Result), 
-                  Reply,
+                  R,
                   [method(post)]). 
 
 
 param(text, [optional(true)]).
+param(name, [optional(true)]).
 
 save_text(Path, Text) :-
     open(Path, write, S),
@@ -70,7 +72,7 @@ allFile('/*
 
   val < int -> int > abs = x -> x if x >= 0 else -x
   
-  method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
+  method <int -> int > fact(n) = 1 if n == 0 else n*fact(n - 1)
   
   main { // Main del programa
      println(String.format("abs(%d)=%d", -x, this.abs.apply(x) ) )

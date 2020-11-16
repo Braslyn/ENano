@@ -109,7 +109,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	}
 	
 	public static class CompileHandler extends DefaultHandler{
-		static String text;
+		String text;
 		@Override
         public String getText() {
             return text;
@@ -194,15 +194,8 @@ public class ENCompiler extends RouterNanoHTTPD {
 		// Report diagnostics - adaptados para retonar json	
 		text="";
 		if (diagsCollector.getDiagnostics().size() == 0){
-			absoluteroute = file.getAbsolutePath();
-			absoluteroute=absoluteroute.replace(file.getName(),"");
-			try{
-				var child= Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1");//& java -cp classes "+name+".class
-				//file.delete();
-				text=Files.lines(Paths.get("solv.txt")).reduce("",(x,y)->x+y+"\\n");
-			}catch(Exception e){ text=e.getMessage();}
 			//------------------------------------------------------------
-			text=String.format("{\"result\":\"%s\"}",text);
+			text=String.format("{\"result\":\"%s\"}","No errors");
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
@@ -219,13 +212,15 @@ public class ENCompiler extends RouterNanoHTTPD {
 		return response;
         }
 	}
-	public static class NameHandler extends DefaultHandler{
-		final Pattern Getline = Pattern.compile("(\\w+): ([a-zA-Z| -.:\\/|[0-9]+]*)");
+	
+	
+	public static class EvaluatorHandler extends DefaultHandler{
 		String text;
 		@Override
         public String getText() {
             return text;
         }
+		
         @Override
         public String getMimeType() {
             return "application/json";
@@ -235,58 +230,49 @@ public class ENCompiler extends RouterNanoHTTPD {
         public Response.IStatus getStatus() {
             return Response.Status.OK;
         }
-		private String Json(Matcher matcher){
-			matcher.find();
-			return String.format("\"%s\":\"%s\"",matcher.group(1),matcher.group(2));	
-		}
-			
-		@Override//devuelve el JSON con la info
-		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
-            //Lee del archivo
-			
-			try{
-				String test=urlParams.get("Name");
-				// for (Map.Entry<String, String> entry : urlParams.entrySet()) {
-				// 	String key = entry.getKey();
-				// 	String value = entry.getValue();
-				// 	test = value;
-				// 	//emc hacer que solo lea uno o el de name 
-				// }				 
-				String filePathString = Paths.get("./classes/"+test+".class").toString();
-				File f = new File(filePathString);
-				if(f.exists() && !f.isDirectory()) { 
-					// do something
-					text="{\"exist\":true";
-				}
-				else{
-					text="{\"exist\":false";
-				}
+		@Override//Compila la clase de java
+		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session){
+				String absoluteroute="";
+				String name="";
+				File file=null;
+				Integer contentLength = Integer.parseInt(session.getHeaders().get( "content-length" ));
+				byte[] buf = new byte[contentLength];
+				try{
+				session.getInputStream().read( buf, 0, contentLength );
+				text=String.format("%s",new String(buf,StandardCharsets.UTF_8));
 				
-				
-				// File dir = new File(Paths.get("./classes/").toString());
-				// FilenameFilter filter = new FilenameFilter() {
-				//    public boolean accept (File dir, String name) { 
-				// 	  return name.startsWith(test);
-				//    } 
-				// }; 
-				// String[] children = dir.list(filter);
-				// if (children == null) {
-				// 	text="{\"exist\":false";
-				//  } else { 
-				// 	text="{\"exist\":true"+clase;
-				// 	} 
+				//hay que encontrar el nombre de la clase
+					
+				Pattern pattern = Pattern.compile("([\\w]+).main\\(\\)");
+				Matcher matcher = pattern.matcher(text);
+				if(matcher.find()){
+					name = matcher.group(1);
+				}else{
+					text="Miss Match";
+					ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+					Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+				}
+				}catch(Exception e){
+					text="Fallo";
+				}
 
-			}catch(Exception ex){
-				text="{\"result\":\""+ex.getMessage()+"\"";
-			}
-			text+="}";
-			
-			//Posible Cliente de DB
-            ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
-			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
-			return response;
-        }
+				absoluteroute = file.getAbsolutePath();
+				absoluteroute=absoluteroute.replace(file.getName(),"");
+				try{
+					file=new File("solv.txt");
+					var child= Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1");//& java -cp classes "+name+".class
+					//file.delete();
+					text=Files.lines(Paths.get("solv.txt")).reduce("",(x,y)->x+y+"\\n");
+				}catch(Exception e){ text=e.getMessage();}
+				text=String.format("{\"result\":\"%s\"}",text);
+				ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+				Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+				return response;
+		}
 	}
+	
+	
+	
 	public ENCompiler(int port) throws IOException {
         super(port);
         addMappings();
@@ -298,7 +284,7 @@ public class ENCompiler extends RouterNanoHTTPD {
     public void addMappings() {
         addRoute("/compile", CompileHandler.class);
 		addRoute("/info", InfoHandler.class);
-		addRoute("/name/:Name", NameHandler.class);
+		addRoute("/evaluate", EvaluatorHandler.class);
     }
 	
 	

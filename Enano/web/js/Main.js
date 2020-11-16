@@ -30,21 +30,21 @@ function init_app(){
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
 	//$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
 	$("#compileRun").on("click", ()=> $("#nameModal").modal('show'));
-	$("#saveName").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
+	$("#finalRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
 	$("#outputTextArea").val('');
 }
 
 async function compile(url,code){
 	if(code!==""){
 		let fileName = $("#name").val();
-		let formData = new FormData()
+		let formData = new FormData();
 		await formData.append('name',fileName);
 		await formData.append('text',code);
 		alert(formData.getAll('name'));
 		$("#compileRun").prop("disabled",true);
 		const response= await fetch(url,{
 		  "method": 'POST',
-		  'Content-Type': 'multipart/form-data',
+		  'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
 		  body: formData
 		});
 		const json= await response.json();

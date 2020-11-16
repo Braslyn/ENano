@@ -4,9 +4,9 @@
   Transpiler of Expressions demo
   modify by Braslyn Rodriguez Ramirez 402420750
 */
-:- module(transpile, [transpileExprFile/1,
-                      transpileExprFile/2,
-                      transpileExprStream/2                      
+:- module(transpile, [transpileExprFile/2,
+                      transpileExprFile/3,
+                      transpileExprStream/3                      
                       ]).
 :- use_module('../NanoParser/parser', [
    parseNanoFile/2 as parse
@@ -14,17 +14,17 @@
 
 %:- use_module('../util/util', [yieldClassName/2]).
 
-transpileExprFile(ExprFile) :-
+transpileExprFile(ExprFile,Name) :-
    current_output(OutStream),
-   transpileExprStream(ExprFile, OutStream)
+   transpileExprStream(ExprFile,Name,OutStream)
 .
-transpileExprFile(ExprFile, OutFile):-
+transpileExprFile(ExprFile,Name,OutFile):-
    open(OutFile, write, OutStream),
-   transpileExprStream(ExprFile, OutStream) 
+   transpileExprStream(ExprFile,Name,OutStream) 
 .
-transpileExprStream(ExprFile, OutStream) :- 
-    parse(ExprFile, Tree),write(Tree),!,
-    transpileNano(Tree,OutStream),write(OutStream)
+transpileExprStream(ExprFile,Name, OutStream) :- 
+    parse(ExprFile,Tree),write(Tree),!,
+    transpileNano(Tree,Name,OutStream),write(OutStream)
 .
 
 %%%%%%%%%%%%%%%%%%%%%%% import manage %%%%%%%%%%%%%%%%
@@ -43,22 +43,22 @@ initImports:- retractall(unary(_)),retractall(imports(_)),retractall(implist(_))
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Transpile Init %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-transpileNano(nanoProgram(Declare,Main),Java):- initImports ,C='public class Simple {~s
-   public static void main(String args[]){~s
+transpileNano(nanoProgram(Declare,Main),Name,Java):- initImports ,C='public class ~s {
+      ~s
+   public static void main(String args[]){   ~s
    }
-   }',
-transpileprogram(Declare,Main,Decs,Lines) , format(atom(Class),C,[Decs,Lines]),retract(imports(Imports)),format(atom(Java),'~s ~s',[Imports,Class]).
+   }', transpileprogram(Declare,Main,Decs,Lines) , write(Name) , format(atom(Class),C,[Name, Decs,Lines]),retract(imports(Imports)),format(atom(Java),'~s ~s',[Imports,Class]).
 
 transpileprogram(declars(List1),main(List2),R1,R2):- dLines(List1,'',R1),blines(List2,'',R2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Dclarations Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-dLines([F|R],Acc,Result):- declareMethod(F,Re1), format(atom(X),'~s \n ~s',[Acc,Re1]) , dLines(R,X,Result).
-dLines([F|R],Acc,Result):- declare(F,Re1), format(atom(X),'~s \n ~s',[Acc,Re1]) , dLines(R,X,Result).
+dLines([F|R],Acc,Result):- declareMethod(F,Re1), format(atom(X),'~s \npublic static ~s',[Acc,Re1]) , dLines(R,X,Result).
+dLines([F|R],Acc,Result):- declare(F,Re1), format(atom(X),'~s \npublic static ~s',[Acc,Re1]) , dLines(R,X,Result).
 dLines([],R1,R):-format(atom(R),'~s',[R1]).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-declareMethod(dec(method,Type,funct(Id,Param),Body),R ):- mbody(Body,R1),dtype2(Type,Ty),paramtype(Type,TP),params(Param,'',P),format(atom(R),'static ~s ~s(~s ~s) ~s',[Ty,Id,TP,P,R1]).
+%cambiar static
+declareMethod(dec(method,Type,funct(Id,Param),Body),R ):- mbody(Body,R1),dtype2(Type,Ty),paramtype(Type,TP),params(Param,'',P),format(atom(R),'~s ~s(~s ~s) ~s',[Ty,Id,TP,P,R1]).
 declare(dec(val,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R),'final ~s ~s ~s; ',[Ty,Id,R1]).
 declare(dec(var,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R),'~s ~s ~s; ',[Ty,Id,R1]).
 %dec(method, type( arrow(int,int) ) , funct( fact,[n] ) , dIf( [1],n==0,funct(f,[n-1] ) ) )
@@ -120,7 +120,7 @@ print(print(X),R):- simplify(X,Y),format(atom(R),'System.out.println(~s);',[Y]).
 
 %%%%%%%%%%%%%%%%%%%% utils Methods %%%%%%%%%%%%%%%%%%%%%%%%
 funct(funct(Id,Param),R):- params(Param,'',P),format(atom(R),'~s(~s)',[Id,P]).
-nobject(obj(Id,funct(Funct,Param)),R):- params(Param,'',P) ,format(atom(R),'this.~s.~s(~s)',[Id,Funct,P]).
+nobject(obj(Id,funct(Funct,Param)),R):- params(Param,'',P) ,format(atom(R),'~s.~s(~s)',[Id,Funct,P]).
 
 /*
    dIf([1],n==0,[funct(fact,[n-1])]))])

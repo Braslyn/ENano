@@ -195,6 +195,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 		text="";
 		if (diagsCollector.getDiagnostics().size() == 0){
 			//------------------------------------------------------------
+			file.delete();
 			text=String.format("{\"result\":\"%s\"}","No errors");
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);

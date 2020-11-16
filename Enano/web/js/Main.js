@@ -28,14 +28,19 @@ function init_app(){
 	$("#clearInput").on("click", () => $("#confirmationModal").modal('show'));
 	$("#confirmClear").on("click", () => inputEditor.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
-	$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
+	//$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
+	$("#compileRun").on("click", ()=> $("#nameModal").modal('show'));
+	$("#saveName").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
 	$("#outputTextArea").val('');
 }
 
 async function compile(url,code){
 	if(code!==""){
+		let fileName = $("#name").val();
 		let formData = new FormData()
+		await formData.append('name',fileName);
 		await formData.append('text',code);
+		alert(formData.getAll('name'));
 		$("#compileRun").prop("disabled",true);
 		const response= await fetch(url,{
 		  "method": 'POST',

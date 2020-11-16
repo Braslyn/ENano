@@ -27,7 +27,15 @@ function init_app(){
 	evaluator.setSize(600, 300);
 	$("#clearInput").on("click", () => inputEditor.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
-	$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
+	//$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
+	$("#compileRun").on("click", ()=> run(inputEditor.getValue()));
+}
+
+function run(code){
+
+	$("#nameModal").modal('show');
+	
+
 }
 
 async function compile(url,code){

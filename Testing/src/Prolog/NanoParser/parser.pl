@@ -68,6 +68,7 @@ expresion(Exp)-->['='], list(Exp).
 expresion([])-->[],!.
 
 
+
 vstring(X) --> [X],{isString(X)}.
 %%%%%%%%%%%%%%%%%%%%%%%%% list exp %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -178,6 +179,9 @@ line(L)--> println(L).
 
 line(L)--> sformat(L).
 
+line(L)--> asignator(L).
+
+asignator(assign(X,O))--> id(X),['='] ,operation(O).
 %%%%%%%%%%%%%%%%%%%%%%%%% Comparators & operators %%%%%%%%%%%%%%%%%%%%%%%%%
 comparator(X) --> [X],{isComparator(X)}.
 operations(X) --> [X],{isOperation(X)}.

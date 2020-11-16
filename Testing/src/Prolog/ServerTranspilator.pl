@@ -46,13 +46,11 @@ http_parameters(Request,[name(Name),text(Text)],
 
 post(Text,N,Result) :- !,format(atom(Name),'./private/~s.no',[N]), 
         save_text(Name, Text),
-        transpile(Name,N,Result),!,save_text('./private/solv.java',Result).
-        /*
+        transpile(Name,N,Result),
         http_post('http://localhost:9090/compile', 
-                  atom('text/plain;charset=utf-8', Text), 
-                  Result,
+                  atom('text/plain;charset=utf-8', Result), 
+                  _,
                   [method(post)]).
-        */
 
 evaluate_handler(Request):- cors_enable,http_parameters(Request,[name(Name)],[attribute_declarations(param), 
                     'application/x-www-form-urlencoded; charset=UTF-8']),evaluate(Name,Json),reply_json(Json).
@@ -99,6 +97,8 @@ simpleTest('/*
   */
   val < int -> int > abs = x -> x if x >= 0 else -x
   main { // Main del programa
+     var<int> x= 12
+     x = x*x
      println(String.format("abs(%d)=%d", -x, this.abs.apply(5)))
 }'). 
 

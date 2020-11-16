@@ -21,7 +21,7 @@ transpileExprFile(ExprFile,Name,OutFile):-
    transpileExprStream(ExprFile,Name,OutStream) 
 .
 transpileExprStream(ExprFile,Name, OutStream) :- 
-    parse(ExprFile,Tree),!,
+    parse(ExprFile,Tree),write(Tree),!,
     transpileNano(Tree,Name,OutStream)
 .
 
@@ -51,8 +51,8 @@ transpileprogram(declars(List1),main(List2),R1,R2):- dLines(List1,'',R1),blines(
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Dclarations Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-dLines([F|R],Acc,Result):- declareMethod(F,Re1), format(atom(X),'~s \npublic static ~s',[Acc,Re1]) , dLines(R,X,Result).
-dLines([F|R],Acc,Result):- declare(F,Re1), format(atom(X),'~s \npublic static ~s',[Acc,Re1]) , dLines(R,X,Result).
+dLines([F|R],Acc,Result):- declareMethod(F,Re1), format(atom(X),'~s \npublic static ~s',[Acc,Re1]) ,!, dLines(R,X,Result).
+dLines([F|R],Acc,Result):- declare(F,Re1), format(atom(X),'~s \npublic static ~s',[Acc,Re1]),! , dLines(R,X,Result).
 dLines([],R1,R):-format(atom(R),'~s',[R1]).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %cambiar static
@@ -99,6 +99,12 @@ blines([F|R],Acc,Result):- line(F,N),format(atom(R1),'~s \n ~s',[Acc,N]),!,bline
 
 line(X,R):-declare(X,R).
 line(X,R):- print(X,R).
+line(X,R):- asignator(X,R).
+
+%%%%%%%%%%%%%%%%%%%% assing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+asignator(assign(Id,Exp),R):- simplify(Exp,E),format(atom(R),'~s=~s',[Id,E]).
+
 
 %%%%%%%%%%%%%%%%%%%% Trees simplify %%%%%%%%%%%%%%%%%%%%%%%%%%%
 simplify(V,R):- nobject(V,R).

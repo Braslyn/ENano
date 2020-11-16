@@ -93,7 +93,6 @@ async function Evaluator(code,evaluator){
 	let formData = new FormData();
 	let line=code.split('\n');
 	await formData.append('line',line[line.length-1]);
-	$("#compileRun").prop("disabled",true);
 	const response= await fetch('http://localhost:3030/evaluate',{
 	  "method": 'POST',
 	  'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',

@@ -259,8 +259,11 @@ public class ENCompiler extends RouterNanoHTTPD {
 					file=new File("solv.txt");
 					absoluteroute = file.getAbsolutePath();
 					absoluteroute=absoluteroute.replace(file.getName(),"");	
-					var child= Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1");//& java -cp classes "+name+".class
-					//file.delete();
+					//----------------------------------------------------------------
+					Process p = Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1");
+					p=null;
+					Thread.sleep(100);
+					//---------------------------------------------------------
 					text=Files.lines(Paths.get("solv.txt")).reduce("",(x,y)->x+y+"\\n");
 				}catch(Exception e){ text=e.getMessage();}
 				text=String.format("{\"result\":\"%s\"}",text);

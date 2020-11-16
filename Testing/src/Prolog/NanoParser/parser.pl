@@ -67,6 +67,7 @@ expresion(Exp)--> ['='] ,numbs(Exp).
 expresion(Exp)-->['='], lambda(Exp).
 expresion(Exp)-->['='], declarativeIf(Exp).
 expresion(Exp)-->['='], list(Exp).
+expresion(Exp)-->['='], operation(Exp).
 expresion([])-->[],!.
 
 
@@ -98,6 +99,7 @@ operation(T)--> function(T).
 operation(T)--> negationNumber(X),generalVariable(V),{unary_tree(X,V,T)}.
 operation(T) --> generalVariable(X),operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
 operation(T) --> ['('], operation(T), [')'].
+operation(T) --> ['('], operation(X), [')'],operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)}.
 operation(T),[')'] --> generalVariable(T),[')'].
 operation(T),[','] --> generalVariable(T),[','].%useless
 operation([T])--> generalVariable(T).

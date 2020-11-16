@@ -1,7 +1,0 @@
-val < double > PI = 3.14
-val < double > E = 2.718
-var <int> x
-val < double -> double > foo = x -> E
-main {
-   
-}

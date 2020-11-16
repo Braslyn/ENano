@@ -67,8 +67,10 @@ dtype(type(list(X)),R):- changeType(X,Y), format(atom(R),'List<~s> ',[Y]),(listI
 dtype(type(Type),Type).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%method body %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %mbody(dIf([F],P,B),R):- params(Param,'',P2) , format(atom(R),'{ return ( ~q )? ~q : ~q(~s); }',[P,F,Funct,P2]).
-mbody(dIf([F],P,funct(Funct,Param)),R):- params(Param,'',P2) , format(atom(R),'{ return ( ~q )? ~q : ~q(~s); }',[P,F,Funct,P2]).
-mbody(dIf([F],P,B),R):- simplify(B,B1),format(atom(R),'{ return ( ~q )? ~q : ~s; }',[P,F,B1]).
+mbody(dIf([F],P,funct(Funct,Param)),R):-simplify(F,F1), params(Param,'',P2) , format(atom(R),'{ return ( ~q )? ~s : ~q(~s); }',[P,F1,Funct,P2]).
+mbody(dIf([F],P,B),R):-simplify(F,F1), simplify(B,B1),format(atom(R),'{ return ( ~q )? ~s : ~s; }',[P,F1,B1]).
+mbody(F,R):-simplify(F,F1),format(atom(R),'{ return ( ~s ); }',[F1]).
+
 dtype2(type(arrow(_,Y)),Y).
 paramtype(type(arrow(X,_)),X).
 %%%%%%%%%%%%%%%%%%%%%%%%%% change types %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,7 +78,7 @@ changeType(X,Y):- (X==int -> Y='Integer');Y=X.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% declaration Body %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % lambda(x,body(dIf([x],x>=0,-x))))
 dbody([],'').
-dbody(lambda(Id,body(dIf([F],P,B))),R):- simplify(F,F1),simplify(B,B1), format(atom(R),'= ~s -> ( ~q )? ~s : ~s',[Id,P,F1,B1]).
+dbody(lambda(Id,body(dIf(F,P,B))),R):- simplify(F,F1),simplify(B,B1), format(atom(R),'= ~s -> ( ~q )? ~s : ~s',[Id,P,F1,B1]).
 dbody(lambda(Id,body(B)),R):- simplify(B,B1) ,format(atom(R),'= ~s -> ~s',[Id,B1]).
 dbody(list(body(X)),R):- params(X,'',L),format(atom(R),'= Arrays.asList(~s)',[L]).
 dbody(X,R):- atom(X),format(atom(R),'= ~s',[X]).
@@ -94,7 +96,7 @@ params2([F|R],Acc,Result):- simplify(F,F1),format(atom(R1),'~s,~s',[Acc,F1]), pa
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Main Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 blines([],Acc,Acc).
-blines([F|R],Acc,Result):- line(F,N),format(atom(R1),'~s \n ~s',[Acc,N]),!,blines(R,R1,Result).
+blines([F|R],Acc,Result):- line(F,N),format(atom(R1),'~s \n ~s;',[Acc,N]),!,blines(R,R1,Result).
 
 
 line(X,R):-declare(X,R).
@@ -103,7 +105,7 @@ line(X,R):- asignator(X,R).
 
 %%%%%%%%%%%%%%%%%%%% assing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-asignator(assign(Id,Exp),R):- simplify(Exp,E),format(atom(R),'~s=~s;',[Id,E]).
+asignator(assign(Id,Exp),R):- simplify(Exp,E),format(atom(R),'~s=~s',[Id,E]).
 
 
 %%%%%%%%%%%%%%%%%%%% Trees simplify %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -111,15 +113,16 @@ simplify(V,R):- nobject(V,R).
 simplify(V,R):- funct(V,R).
 simplify(V,R):- atom(V),format(atom(R),'~s',[V]).
 simplify(V,R):- number(V),format(atom(R),'~d',[V]).
+simplify([V],R):- simplify(V,R).
 simplify(V,T):- V=..[Oper,X,Y], simplify(X,X1),simplify(Y,Y1),format(atom(T),'~s~s~s',[X1,Oper,Y1]).
 simplify(V,R):- V=..[Oper,X],simplify(X,X1),format(atom(R),'~s~s',[Oper,X1]).
 
 
 %%%%%%%%%%%%%%%%%%%% Print statment %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %print(format("fact(%d)=%d",[5,funct(fact,[5])]))
-print(print(format(String,Param)),R):- params(Param,'',P) ,format(atom(R),'System.out.println(String.format(~s,~s));',[String,P]).
+print(print(format(String,Param)),R):- params(Param,'',P) ,format(atom(R),'System.out.println(String.format(~s,~s))',[String,P]).
 %print(print(format(String,Param)),R):- params(Param,'',P), format(atom(R),'System.out.println(~s,~s);',[String,P]).
-print(print(X),R):- simplify(X,Y),format(atom(R),'System.out.println(~s);',[Y]).
+print(print(X),R):- simplify(X,Y),format(atom(R),'System.out.println(~s)',[Y]).
 
 
 %%%%%%%%%%%%%%%%%%%% utils Methods %%%%%%%%%%%%%%%%%%%%%%%%

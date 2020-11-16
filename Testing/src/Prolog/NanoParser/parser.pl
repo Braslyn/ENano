@@ -88,14 +88,17 @@ lambda(lambda(X,body(N)))--> id(X) , ['->'] , variable(N).
 
 lambda(lambda(X,body(N)))--> id(X) , ['->'] , operation(N).
 
-%modificar ----------------------------------------------------------------------------------------------
+%modificar (+-) ----------------------------------------------------------------------------------------------
+
 operation(T)--> sObjects(T).
 operation(T)--> function(T).
 operation(T)--> negationNumber(X),generalVariable(V),{unary_tree(X,V,T)}.
 operation(T) --> generalVariable(X),operations(Oper),operation(Y),{build_tree(Oper,[X|Y],T)} .
 operation(T) --> ['('], operation(T), [')'].
 operation(T),[')'] --> generalVariable(T),[')'].
-operation([T]) --> generalVariable(T).
+operation(T),[','] --> generalVariable(T),[','].%useless
+operation([T])--> generalVariable(T).
+
 %%%%%%%%%%%%%%%%%%%%%%%% if -- ternario %%%%%%%%%%%%%%%%%%%%%%%
 
 if(if(X,Body,Else)) --> [if], ['('],predicate(X),[')'],['{'],lines(Body),['}'], else(Else).

@@ -35,7 +35,8 @@ transpileExprStream(ExprFile, OutStream) :-
 unarImport:- (retract(unary(X)),assert(unary(X)),X==fail) -> (retract(unary(_)),assert(unary(true)),retract(imports(R)),format(atom(F),'~simport java.util.function.UnaryOperator;\n',[R])
 ,assert(imports(F))).
 
-listImport:- (retract(implist(X)),assert(implist(X)),X==fail) -> (retract(implist(_)),assert(implist(true)),retract(imports(R)),format(atom(F),'~simport java.util.ArrayList;\n',[R])
+listImport:- (retract(implist(X)),assert(implist(X)),X==fail) -> (retract(implist(_)),assert(implist(true)),retract(imports(R)),format(atom(F),'~simport java.util.Arrays;
+import java.util.List;\n',[R])
 ,assert(imports(F))).
 
 initImports:- retractall(unary(_)),retractall(imports(_)),retractall(implist(_)),assert(imports('')),assert(unary(fail)),assert(implist(fail)).
@@ -44,7 +45,8 @@ initImports:- retractall(unary(_)),retractall(imports(_)),retractall(implist(_))
 %%%%%%%%%%%%%%%%%%%%%%%%% Transpile Init %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 transpileNano(nanoProgram(Declare,Main),Java):- initImports ,C='public class Simple {~s
    public static void main(String args[]){~s
-   }}',
+   }
+   }',
 transpileprogram(Declare,Main,Decs,Lines) , format(atom(Class),C,[Decs,Lines]),retract(imports(Imports)),format(atom(Java),'~s ~s',[Imports,Class]).
 
 transpileprogram(declars(List1),main(List2),R1,R2):- dLines(List1,'',R1),blines(List2,'',R2).
@@ -74,20 +76,22 @@ paramtype(type(arrow(X,_)),X).
 %%%%%%%%%%%%%%%%%%%%%%%%%% change types %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 changeType(X,Y):- (X==int -> Y='Integer');Y=X.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% declaration Body %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-dbody([],' ').
-dbody(lambda(Id,body(dIf([F],P,[B]))),R):-simplify(B,B1), format(atom(R),'= ~s -> ( ~q )? ~q : ~s',[Id,P,F,B1]).
+% lambda(x,body(dIf([x],x>=0,-x))))
+dbody([],'').
+dbody(lambda(Id,body(dIf([F],P,B))),R):- simplify(F,F1),simplify(B,B1), format(atom(R),'= ~s -> ( ~q )? ~s : ~s',[Id,P,F1,B1]).
 dbody(lambda(Id,body(B)),R):- simplify(B,B1) ,format(atom(R),'= ~s -> ~s',[Id,B1]).
 dbody(list(body(X)),R):- params(X,'',L),format(atom(R),'= Arrays.asList(~s)',[L]).
 dbody(X,R):- atom(X),format(atom(R),'= ~s',[X]).
 dbody(X,R):- format(atom(R),'= ~q',[X]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% Params %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 params([],'','').
-params([F|R],Acc,Result):- object(F,L) ,format(atom(R1),'~s~q',[Acc,L]), params2(R,R1,Result).
-params([F|R],Acc,Result):- format(atom(R1),'~s~q',[Acc,F]), params2(R,R1,Result).
+params([F|R],Acc,Result):- simplify(F,F1) ,format(atom(R1),'~s~s',[Acc,F1]), params2(R,R1,Result).
+%params([F|R],Acc,Result):- format(atom(R1),'~s~q',[Acc,F]), params2(R,R1,Result).
 params2([],Acc,Acc).
-params2([F|R],Acc,Result):- object(F,L) ,format(atom(R1),'~s~q',[Acc,L]), params2(R,R1,Result).
-params2([F|R],Acc,Result):- format(atom(R1),'~s,~q',[Acc,F]),params2(R,R1,Result).
+params2([F|R],Acc,Result):- simplify(F,F1),format(atom(R1),'~s,~s',[Acc,F1]), params2(R,R1,Result).
+%params2([F|R],Acc,Result):- format(atom(R1),'~s,~q',[Acc,F]),params2(R,R1,Result).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Main Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -99,23 +103,24 @@ line(X,R):-declare(X,R).
 line(X,R):- print(X,R).
 
 %%%%%%%%%%%%%%%%%%%% Trees simplify %%%%%%%%%%%%%%%%%%%%%%%%%%%
+simplify(V,R):- nobject(V,R).
 simplify(V,R):- funct(V,R).
 simplify(V,R):- atom(V),format(atom(R),'~s',[V]).
 simplify(V,R):- number(V),format(atom(R),'~d',[V]).
-simplify(V,R):- V=..[Oper,X],format(R,'~s~s',[Oper,X]).
 simplify(V,T):- V=..[Oper,X,Y], simplify(X,X1),simplify(Y,Y1),format(atom(T),'~s~s~s',[X1,Oper,Y1]).
+simplify(V,R):- V=..[Oper,X],simplify(X,X1),format(atom(R),'~s~s',[Oper,X1]).
 
 
 %%%%%%%%%%%%%%%%%%%% Print statment %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-print(print(format(String,Param)),R):- params(Param,'',P) ,format(atom(R),'System.out.println(~s,~s);',[String,P]).
-print(print(format(String,Param)),R):- params(Param,'',P), format(atom(R),'System.out.println(~s,~s);',[String,P]).
-print(print(funct(Id,Param)),R):- params(Param,'',P) , format(atom(R),'System.out.println(~s(~s));',[Id,P]).
-print(print(X),R):- atom(X),format(atom(R),'System.out.println(~s);',[X]).
-print(print(X),R):- format(atom(R),'System.out.println(~q);',[X]).
+%print(format("fact(%d)=%d",[5,funct(fact,[5])]))
+print(print(format(String,Param)),R):- params(Param,'',P) ,format(atom(R),'System.out.println(String.format(~s,~s));',[String,P]).
+%print(print(format(String,Param)),R):- params(Param,'',P), format(atom(R),'System.out.println(~s,~s);',[String,P]).
+print(print(X),R):- simplify(X,Y),format(atom(R),'System.out.println(~s);',[Y]).
+
 
 %%%%%%%%%%%%%%%%%%%% utils Methods %%%%%%%%%%%%%%%%%%%%%%%%
 funct(funct(Id,Param),R):- params(Param,'',P),format(atom(R),'~s(~s)',[Id,P]).
-object(obj(Id,funct(Funct,Param)),R):- params(Param,'',P) ,format(atom(R),'this.~s.~s(~s);',[Id,Funct,P]).
+nobject(obj(Id,funct(Funct,Param)),R):- params(Param,'',P) ,format(atom(R),'this.~s.~s(~s)',[Id,Funct,P]).
 
 /*
    dIf([1],n==0,[funct(fact,[n-1])]))])

@@ -3,7 +3,7 @@
     Asuma archivo se llama Demo1.no
   */
   
-  val <int> x = "66"
+  val <int> x = 66
 
   val < int -> int > abs = x -> x if x >= 0 else -x
   

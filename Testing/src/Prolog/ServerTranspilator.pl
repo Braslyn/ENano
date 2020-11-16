@@ -66,7 +66,7 @@ allFile('/*
     Asuma archivo se llama Demo1.no
   */
   
-  val <int> x = "66"
+  val <int> x = 66
 
   val < int -> int > abs = x -> x if x >= 0 else -x
   
@@ -81,17 +81,14 @@ allFile('/*
 }').
 
 
-simpleTest('
-  val <int> x = x -> x+1
-  
-  val < int -> int > abs = x -> x if x >= 0 else 1
-  
-  method <int -> int > fact(n) = 1 if n == 0 else fact(n - 1)
-    main{
-        var <int> k = 6
-        println(fact(k))
-        //println(String.format("fact(%d)=%d", 5, fact(5)))
-    }'). 
+simpleTest('/*
+    Demo1
+    Asuma archivo se llama Demo1.no
+  */
+  val < int -> int > abs = x -> x if x >= 0 else -x
+  main { // Main del programa
+     println(String.format("abs(%d)=%d", -x, this.abs.apply(5)))
+}'). 
 
 
 

@@ -108,7 +108,8 @@ function fillAuthors({members}){
 }
 function saveCode(code){
 	var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
-	saveAs(blob, "code.java");
+
+	saveAs(blob, 'file.no');
 }
 
 function showAbout(){

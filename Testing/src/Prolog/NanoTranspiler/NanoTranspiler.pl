@@ -21,7 +21,7 @@ transpileExprFile(ExprFile,Name,OutFile):-
    transpileExprStream(ExprFile,Name,OutStream) 
 .
 transpileExprStream(ExprFile,Name, OutStream) :- 
-    parse(ExprFile,Tree),write(Tree),!,
+    parse(ExprFile,Tree),!,
     transpileNano(Tree,Name,OutStream)
 .
 

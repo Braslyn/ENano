@@ -44,9 +44,9 @@ http_parameters(Request,[name(Name),text(Text)],
         ),post(Text,Name,R),reply_json(json([result=R])).
 
 
-post(Text,N,Result) :- !,format(atom(Name),'./private/~s.no',[N]), 
+post(Text,N,Result) :- format(atom(Name),'./private/~s.no',[N]), 
         save_text(Name, Text),
-        transpile(Name,N,Result),
+        transpile(Name,N,Result),!,
         http_post('http://localhost:9090/compile', 
                   atom('text/plain;charset=utf-8', Result), 
                   _,

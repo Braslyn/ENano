@@ -17,7 +17,7 @@ function init_app(){
 		theme: 'dracula',
 		mode:"text/x-java"
 	});
-	inputEditor.setSize(600, 450);
+	inputEditor.setSize(600, 500);
 	var evaluator = CodeMirror.fromTextArea
 	(document.getElementById('evaluatorTextArea'), { 
 		lineNumbers: true,
@@ -38,8 +38,8 @@ function init_app(){
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
 	//$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
 	$("#compileRun").on("click", ()=> $("#nameModal").modal('show'));
-	$("#finalRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue(),inputEditor));
-	evaluator.on("keypress",()=> SendEvaluator(event));
+	$("#finalRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue(),out));
+	evaluator.on("keypress",()=> SendEvaluator(event,evaluator));
 }
 
 async function compile(url,code,output){
@@ -56,7 +56,7 @@ async function compile(url,code,output){
 		  body: formData
 		});
 		const json= await response.json();
-		output.setValue(json.result);
+		output.getDoc().setValue(json.result);
 		$("#compileRun").prop("disabled",false);
 	}else{
 		$("#outputTextArea").val("Text something");
@@ -80,12 +80,29 @@ function fillInfo({team,nrc,version,projectSite,repository}){
 }
 
 
-function SendEvaluator(event){
+function SendEvaluator(event,evaluator){
 	var key = window.event.keyCode;
-	alert(key)
+	//alert(evaluator.getDoc().getValue())
 	if (key === 13) {
-        //send la picha
+        Evaluator(evaluator.getDoc().getValue(),evaluator);
     }
+}
+
+async function Evaluator(code,evaluator){
+	let fileName = $("#line").val();
+	let formData = new FormData();
+	let line=code.split('\n');
+	alert(line.length);
+	await formData.append('line',line[line.length-1]);
+	$("#compileRun").prop("disabled",true);
+	const response= await fetch('http://localhost:3030/evaluate',{
+	  "method": 'POST',
+	  'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+	  body: formData
+	});
+	const json= await response.json();
+	evaluator.getDoc().setValue(code+'\n'+json.result);
+	
 }
 
 function fillAuthors({members}){

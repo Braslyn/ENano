@@ -238,28 +238,27 @@ public class ENCompiler extends RouterNanoHTTPD {
 				Integer contentLength = Integer.parseInt(session.getHeaders().get( "content-length" ));
 				byte[] buf = new byte[contentLength];
 				try{
-				session.getInputStream().read( buf, 0, contentLength );
-				text=String.format("%s",new String(buf,StandardCharsets.UTF_8));
-				
-				//hay que encontrar el nombre de la clase
+					session.getInputStream().read( buf, 0, contentLength );
+					text=String.format("%s",new String(buf,StandardCharsets.UTF_8));
 					
-				Pattern pattern = Pattern.compile("([\\w]+).main\\(\\)");
-				Matcher matcher = pattern.matcher(text);
-				if(matcher.find()){
-					name = matcher.group(1);
-				}else{
-					text="Miss Match";
-					ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
-					Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
-				}
+					//hay que encontrar el nombre de la clase
+						
+					Pattern pattern = Pattern.compile("([\\w]+).main\\(\\)");
+					Matcher matcher = pattern.matcher(text);
+					if(matcher.find()){
+						name = matcher.group(1);
+					}else{
+						text="Miss Match";
+						ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+						Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+					}
 				}catch(Exception e){
 					text="Fallo";
 				}
-
-				absoluteroute = file.getAbsolutePath();
-				absoluteroute=absoluteroute.replace(file.getName(),"");
 				try{
 					file=new File("solv.txt");
+					absoluteroute = file.getAbsolutePath();
+					absoluteroute=absoluteroute.replace(file.getName(),"");	
 					var child= Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1");//& java -cp classes "+name+".class
 					//file.delete();
 					text=Files.lines(Paths.get("solv.txt")).reduce("",(x,y)->x+y+"\\n");

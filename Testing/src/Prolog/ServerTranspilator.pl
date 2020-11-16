@@ -38,6 +38,7 @@ server(Port) :-                                            % (2)
 http_server(http_dispatch, [port(Port)]).
 
 :- http_handler('/transpile', transpile_handler ,[method(post)]). 
+:- http_handler('/evaluate', evaluate_handler ,[method(post)]). 
 
 
 transpile_handler(Request) :-cors_enable,
@@ -54,15 +55,16 @@ post(Text,N,Result) :- format(atom(Name),'./private/~s.no',[N]),
                   _,
                   [method(post)]).
 
-evaluate_handler(Request):- cors_enable,http_parameters(Request,[name(Name)],[attribute_declarations(param), 
-                    'application/x-www-form-urlencoded; charset=UTF-8']),evaluate(Name,Json),reply_json(Json).
+evaluate_handler(Request):- cors_enable,http_parameters(Request,[line(Line)],[attribute_declarations(param), 
+                    'application/x-www-form-urlencoded; charset=UTF-8']),evaluate(Line,Json),reply_json(Json).
         
 
 evaluate(Name,Json):- http_post('http://localhost:9090/evaluate', 
     atom('text/plain;charset=utf-8', Name), 
     Json,
-    [method(post)]),reply_json(Json). 
+    [method(post)]). 
 
+param(line, [optional(true)]).
 param(text, [optional(true)]).
 param(name, [optional(true)]).
 

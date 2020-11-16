@@ -31,7 +31,7 @@ function init_app(){
 		theme: 'dracula',
 		mode:"text/x-java"
 	});
-	out.setSize(600, 600);
+	out.setSize(550, 500);
 	$("#clearInput").on("click", () => $("#confirmationModal").modal('show'));
 	$("#confirmClear").on("click", () => inputEditor.setValue(""));
 	$("#ClearOutPut").on("click", () => out.setValue(""));

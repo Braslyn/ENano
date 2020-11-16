@@ -484,10 +484,10 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
                     "instanceof interface native new package private protected public " +
                     "return static strictfp super switch synchronized this throw throws transient " +
                     "try volatile while @interface"),
-    types: words("byte short int long float double boolean char void Boolean Byte Character Double Float " +
+    types: words("var val method byte short int long float double boolean char void Boolean Byte Character Double Float " +
                  "Integer Long Number Object Short String StringBuffer StringBuilder Void"),
-    blockKeywords: words("catch class do else finally for if switch try while"),
-    defKeywords: words("class interface enum @interface"),
+    blockKeywords: words("main catch class do else finally for if switch try while"),
+    defKeywords: words("println class interface enum @interface"),
     typeFirstDefinitions: true,
     atoms: words("true false null"),
     number: /^(?:0x[a-f\d_]+|0b[01_]+|(?:[\d_]+\.?\d*|\.\d+)(?:e[-+]?[\d_]+)?)(u|ll?|l|f)?/i,
@@ -505,7 +505,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
 
   def("text/x-csharp", {
     name: "clike",
-    keywords: words("abstract as async await base break case catch checked class const continue" +
+    keywords: words(" abstract as async await base break case catch checked class const continue" +
                     " default delegate do else enum event explicit extern finally fixed for" +
                     " foreach goto if implicit in interface internal is lock namespace new" +
                     " operator out override params private protected public readonly ref return sealed" +

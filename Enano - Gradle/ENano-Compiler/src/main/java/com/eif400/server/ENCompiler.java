@@ -3,6 +3,10 @@
 		Enrique Mendez Cabezas 117390080
 		Braslyn Rodriguez Ramirez 402420750
 		Philippe Gairaud Quesada 117290193
+		
+	Basado en la clase compilador de Carlos Loria Saenz
+	@author loriacarlos@gmail.com
+	JavaAPICompiler
 */
 package com.eif400.server;
 
@@ -26,6 +30,9 @@ import static fi.iki.elonen.NanoHTTPD.SOCKET_READ_TIMEOUT;
 import fi.iki.elonen.router.RouterNanoHTTPD.DefaultHandler;
 import fi.iki.elonen.router.RouterNanoHTTPD.IndexHandler;
 
+import fi.iki.elonen.router.RouterNanoHTTPD.UriResource;
+import fi.iki.elonen.router.RouterNanoHTTPD.UriResponder;
+
 import java.util.logging.Level; 
 import java.util.logging.Logger;
 
@@ -43,6 +50,63 @@ import javax.tools.*;
 public class ENCompiler extends RouterNanoHTTPD {
     static int PORT = 9090;
 	Logger logger = Logger.getLogger(ENCompiler.class.getName());
+	
+	public static class InfoHandler extends DefaultHandler{
+		final Pattern Getline = Pattern.compile("(\\w+): ([a-zA-Z| -.:\\/|[0-9]+]*)");
+		String text;
+		@Override
+        public String getText() {
+            return text;
+        }
+        @Override
+        public String getMimeType() {
+            return "application/json";
+        }
+     
+        @Override
+        public Response.IStatus getStatus() {
+            return Response.Status.OK;
+        }
+		private String Json(Matcher matcher){
+			matcher.find();
+			return String.format("\"%s\":\"%s\"",matcher.group(1),matcher.group(2));	
+		}
+			
+		@Override//devuelve el JSON con la info
+		public Response get(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
+            //Lee del archivo
+			try{
+				var Data= Files.lines(Paths.get("./web/Data_Json/Info.txt")).collect(Collectors.toList());
+				text = Data.stream().reduce("{",(x,y)-> x+Json(Getline.matcher(y))+",");
+				Data = Files.lines(Paths.get("./web/Data_Json/Authors.txt")).collect(Collectors.toList());
+				Data = Data.stream().map(line -> Getline.matcher(line) ).map( match -> Json(match) ).collect(Collectors.toList());
+				String team=String.format("\"team\":{%s,\"members\":[",Data.get(0));
+				
+				for(int i=1;i<Data.size();i++){
+					switch((i-1)%3){
+					case 0:
+						team+="{"+Data.get(i)+",";
+						break;
+					case 1:
+						team+=Data.get(i)+",";
+						break;
+					case 2:
+						team+= i+1==Data.size()? Data.get(i)+"}":Data.get(i)+"},";
+						break;
+					}
+				}
+				team+="]}";
+				text+=text.format(team);
+			}catch(Exception ex){
+				text="{\"result\":\""+ex.getMessage()+"\"";
+			}
+			text+="}";
+			//Posible Cliente de DB
+            ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+			return response;
+        }
+	}
 	
 	public static class CompileHandler extends DefaultHandler{
 		String text;
@@ -69,35 +133,35 @@ public class ENCompiler extends RouterNanoHTTPD {
 			try{
 			session.getInputStream().read( buf, 0, contentLength );
 			text=String.format("%s",new String(buf,StandardCharsets.UTF_8));
-		}catch(Exception e){
-			text="Fallo";
-		}
-		
-		String name="file";
-		
-		try{
-			//hay que encontrar el nombre de la clase
-			
-			Pattern pattern = Pattern.compile("class (\\w+)\\{", Pattern.DOTALL);
-			Matcher matcher = pattern.matcher(text);
-			if(matcher.find()){
-				name = matcher.group(1);
+			}catch(Exception e){
+				text="Fallo";
 			}
-			
-		//se crea el archivo y se escribe en él.
-			file = new File(name+".java");
-			if (file.createNewFile()) {
-				FileWriter myWriter = new FileWriter(name+".java");
-				myWriter.write(text);
-				myWriter.close();
-			} else {
-				FileWriter myWriter = new FileWriter(name+".java");
-				myWriter.write(text);
-				myWriter.close();
+		
+			String name="file";
+			String absoluteroute="";
+			try{
+				//hay que encontrar el nombre de la clase
+				
+				Pattern pattern = Pattern.compile("class ([a-zA-Z_][\\w]+)");
+				Matcher matcher = pattern.matcher(text);
+				if(matcher.find()){
+					name = matcher.group(1);
+				}
+				
+				//se crea el archivo y se escribe en él.
+				file = new File(name+".java");
+				if (file.createNewFile()) {
+					FileWriter myWriter = new FileWriter(name+".java");
+					myWriter.write(text);
+					myWriter.close();
+				} else {
+					FileWriter myWriter = new FileWriter(name+".java");
+					myWriter.write(text);
+					myWriter.close();
+				}
+			}catch(Exception e){
+				
 			}
-		}catch(Exception e){
-			
-		}
 			//------------------------------------------------------------
 		text="";
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -127,32 +191,87 @@ public class ENCompiler extends RouterNanoHTTPD {
 		  System.err.format("%s%n", e);
 		  System.exit(-1);
 		}
-		// Report diagnostics - adaptados para retonar json
+		// Report diagnostics - adaptados para retonar json	
 		text="";
 		if (diagsCollector.getDiagnostics().size() == 0){
-			text="*** No errors found ***";
-			file.delete();
 			//------------------------------------------------------------
-			text=String.format("{\"result\":\"%s\"}",text);
+			text=String.format("{\"result\":\"%s\"}","No errors");
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
 		}
-		for( var d: diagsCollector.getDiagnostics() ) {
-			long pos = d.getLineNumber();
-			String location = pos >= 0 ? String.format("Line: %d", pos) : "Unavailable:";
-			text+=String.format("%s %s \\n",
-				location, 
-				d.getMessage( locale.ENGLISH ).replaceAll("\n"," "));
-		}	
-			file.delete();
-			//------------------------------------------------------------
-			text=String.format("{\"result\":\"%s\"}",text);
-            ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
-			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
-			return response;
+		//Errores
+		var texto=diagsCollector.getDiagnostics().stream().
+								reduce( new StringBuffer(),(stbff,line) -> stbff.append("Line: "+line.getLineNumber()+" -> "+
+								line.getMessage( locale.ENGLISH ).replaceAll("\n","\\n")),(x,y)->x);	
+		file.delete();
+		//------------------------------------------------------------
+		text=String.format("{\"result\":\"%s\"}",texto.toString());
+		ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+		Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+		return response;
         }
 	}
+	
+	
+	public static class EvaluatorHandler extends DefaultHandler{
+		String text;
+		@Override
+        public String getText() {
+            return text;
+        }
+		
+        @Override
+        public String getMimeType() {
+            return "application/json";
+        }
+     
+        @Override
+        public Response.IStatus getStatus() {
+            return Response.Status.OK;
+        }
+		@Override//Compila la clase de java
+		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session){
+				String absoluteroute="";
+				String name="";
+				File file=null;
+				Integer contentLength = Integer.parseInt(session.getHeaders().get( "content-length" ));
+				byte[] buf = new byte[contentLength];
+				try{
+				session.getInputStream().read( buf, 0, contentLength );
+				text=String.format("%s",new String(buf,StandardCharsets.UTF_8));
+				
+				//hay que encontrar el nombre de la clase
+					
+				Pattern pattern = Pattern.compile("([\\w]+).main\\(\\)");
+				Matcher matcher = pattern.matcher(text);
+				if(matcher.find()){
+					name = matcher.group(1);
+				}else{
+					text="Miss Match";
+					ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+					Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+				}
+				}catch(Exception e){
+					text="Fallo";
+				}
+
+				absoluteroute = file.getAbsolutePath();
+				absoluteroute=absoluteroute.replace(file.getName(),"");
+				try{
+					file=new File("solv.txt");
+					var child= Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1");//& java -cp classes "+name+".class
+					//file.delete();
+					text=Files.lines(Paths.get("solv.txt")).reduce("",(x,y)->x+y+"\\n");
+				}catch(Exception e){ text=e.getMessage();}
+				text=String.format("{\"result\":\"%s\"}",text);
+				ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
+				Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
+				return response;
+		}
+	}
+	
+	
 	
 	public ENCompiler(int port) throws IOException {
         super(port);
@@ -164,6 +283,8 @@ public class ENCompiler extends RouterNanoHTTPD {
 	@Override
     public void addMappings() {
         addRoute("/compile", CompileHandler.class);
+		addRoute("/info", InfoHandler.class);
+		addRoute("/evaluate", EvaluatorHandler.class);
     }
 	
 	
@@ -172,6 +293,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 	public Response serve(IHTTPSession session){
 		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
 		String origin="*";
+		//System.out.println(session.getHeaders());
 		/*boolean cors_allowed= request_header!=null && 
 								"cors".equals(request_header.get("sec-fetch-mode"))&&
 								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0

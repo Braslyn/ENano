@@ -35,6 +35,7 @@ function init_app(){
 	$("#clearInput").on("click", () => $("#confirmationModal").modal('show'));
 	$("#confirmClear").on("click", () => inputEditor.setValue(""));
 	$("#ClearOutPut").on("click", () => out.setValue(""));
+	$("#clearEvaluator").on("click", () => evaluator.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
 	//$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
 	$("#compileRun").on("click", ()=> $("#nameModal").modal('show'));

@@ -25,16 +25,24 @@ function init_app(){
 		mode:"text/x-java"
 	});
 	evaluator.setSize(600, 300);
+	var out = CodeMirror.fromTextArea
+	(document.getElementById('outputTextArea'), { 
+		lineNumbers: true,
+		theme: 'dracula',
+		mode:"text/x-java"
+	});
+	out.setSize(600, 600);
 	$("#clearInput").on("click", () => $("#confirmationModal").modal('show'));
 	$("#confirmClear").on("click", () => inputEditor.setValue(""));
+	$("#ClearOutPut").on("click", () => out.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
 	//$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
 	$("#compileRun").on("click", ()=> $("#nameModal").modal('show'));
-	$("#finalRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
-	$("#outputTextArea").val('');
+	$("#finalRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue(),inputEditor));
+	evaluator.on("keypress",()=> SendEvaluator(event));
 }
 
-async function compile(url,code){
+async function compile(url,code,output){
 	if(code!==""){
 		let fileName = $("#name").val();
 		let formData = new FormData();
@@ -48,7 +56,7 @@ async function compile(url,code){
 		  body: formData
 		});
 		const json= await response.json();
-		$("#outputTextArea").val(json.result);
+		output.setValue(json.result);
 		$("#compileRun").prop("disabled",false);
 	}else{
 		$("#outputTextArea").val("Text something");
@@ -71,6 +79,15 @@ function fillInfo({team,nrc,version,projectSite,repository}){
 	fillAuthors(team);
 }
 
+
+function SendEvaluator(event){
+	var key = window.event.keyCode;
+	alert(key)
+	if (key === 13) {
+        //send la picha
+    }
+}
+
 function fillAuthors({members}){
 	let index=1;
 	members.forEach( (member)=> $("#author"+index++).text(member.Name+" "+member.Surnames+" "+member.id) )
@@ -88,6 +105,6 @@ function clearInput(){
 	$("#outputTextArea").val('');
 }
 function clearOutput(){
-	$("#outputTextArea").val('');
+	$("#outputTextArea").setValue('');
 }
 window.addEventListener("load", init_app, false);

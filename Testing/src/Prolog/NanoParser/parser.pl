@@ -2,6 +2,8 @@
   loriacarlos@gmail.com
   II-2020
   modify by Braslyn Rodriguez Ramirez 402420750
+  		      Enrique Mendez Cabezas 117390080
+            Philippe Gairaud Quesada 117290193
 */
 
 :- module(parser, [ parseNanoFile/2,

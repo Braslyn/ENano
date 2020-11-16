@@ -1,6 +1,8 @@
 /*
 Servidor de transpilacion
 author: Braslyn Rodriguez Ramirez 402420750
+        Enrique Mendez Cabezas 117390080
+        Philippe Gairaud Quesada 117290193
 Based on: Carlos Loria's Prolog  proyects Web Demo and Enano transpiler demo
 since: 2020
 */

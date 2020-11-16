@@ -22,8 +22,11 @@ se encuentra el pom.xml ingrese el comando de
 "java --enable-preview -jar ENano-Compiler\build\libs\ENano-Compiler-1.0-SNAPSHOT.jar"
 con el objetivo de iniciar el servidor de Servicios ECompiler.
 
-5-Con ambos servidores activos estamos listos para utilizar la pagina web:
+5- En una de las terminales ejecutar swipl ServerTrasnpilator.pl
+
+6-Con ambos servidores activos estamos listos para utilizar la pagina web:
 http://localhost:5231/ para el servidor estatico.
+
 --------------------------------------------------------------------------------------------
 URLs
 Las siguientes urls corresponden al servidor estatico con puerto 8080 por defecto, pero

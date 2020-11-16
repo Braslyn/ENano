@@ -2,6 +2,8 @@
 EIF400 loriacarlos@gmail.com
 Simple recursive lexer Demo
 modify by Braslyn Rodriguez Ramirez 402420750
+          Enrique Mendez Cabezas 117390080
+          Philippe Gairaud Quesada 117290193
 II-2020
 */
 

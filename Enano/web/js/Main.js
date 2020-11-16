@@ -92,7 +92,6 @@ async function Evaluator(code,evaluator){
 	let fileName = $("#line").val();
 	let formData = new FormData();
 	let line=code.split('\n');
-	alert(line.length);
 	await formData.append('line',line[line.length-1]);
 	$("#compileRun").prop("disabled",true);
 	const response= await fetch('http://localhost:3030/evaluate',{
@@ -102,7 +101,6 @@ async function Evaluator(code,evaluator){
 	});
 	const json= await response.json();
 	evaluator.getDoc().setValue(code+'\n'+json.result);
-	
 }
 
 function fillAuthors({members}){

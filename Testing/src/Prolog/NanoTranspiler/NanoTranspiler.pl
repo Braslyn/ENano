@@ -103,7 +103,7 @@ line(X,R):- asignator(X,R).
 
 %%%%%%%%%%%%%%%%%%%% assing %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-asignator(assign(Id,Exp),R):- simplify(Exp,E),format(atom(R),'~s=~s',[Id,E]).
+asignator(assign(Id,Exp),R):- simplify(Exp,E),format(atom(R),'~s=~s;',[Id,E]).
 
 
 %%%%%%%%%%%%%%%%%%%% Trees simplify %%%%%%%%%%%%%%%%%%%%%%%%%%%

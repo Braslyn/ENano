@@ -44,15 +44,15 @@ http_server(http_dispatch, [port(Port)]).
 transpile_handler(Request) :-cors_enable,
 http_parameters(Request,[name(Name),text(Text)],
          [attribute_declarations(param), 'application/x-www-form-urlencoded; charset=UTF-8']
-        ),post(Text,Name,R),reply_json(json([result=R])).
+        ),post(Text,Name,R,Json),reply_json(json([result=R,state=Json])).
 
 
-post(Text,N,Result) :- format(atom(Name),'./private/~s.no',[N]), 
+post(Text,N,Result,R) :- format(atom(Name),'./private/~s.no',[N]), 
         save_text(Name, Text),
         transpile(Name,N,Result),!,
         http_post('http://localhost:9090/compile', 
                   atom('text/plain;charset=utf-8', Result), 
-                  _,
+                  json([result=R]),
                   [method(post)]).
 
 evaluate_handler(Request):- cors_enable,http_parameters(Request,[line(Line)],[attribute_declarations(param), 
@@ -103,7 +103,7 @@ simpleTest('/*
   main { // Main del programa
      var<int> x= 12
      x = x*x
-     println(String.format("abs(%d)=%d", -x, this.abs.apply(5)))
+     println(x)
 }'). 
 
 

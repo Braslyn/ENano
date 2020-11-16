@@ -17,7 +17,7 @@ function init_app(){
 		theme: 'dracula',
 		mode:"text/x-java"
 	});
-	inputEditor.setSize(600, 450);
+	inputEditor.setSize(600, 500);
 	var evaluator = CodeMirror.fromTextArea
 	(document.getElementById('evaluatorTextArea'), { 
 		lineNumbers: true,
@@ -25,16 +25,24 @@ function init_app(){
 		mode:"text/x-java"
 	});
 	evaluator.setSize(600, 300);
+	var out = CodeMirror.fromTextArea
+	(document.getElementById('outputTextArea'), { 
+		lineNumbers: true,
+		theme: 'dracula',
+		mode:"text/x-java"
+	});
+	out.setSize(600, 600);
 	$("#clearInput").on("click", () => $("#confirmationModal").modal('show'));
 	$("#confirmClear").on("click", () => inputEditor.setValue(""));
+	$("#ClearOutPut").on("click", () => out.setValue(""));
 	$("#saveCode").on("click", () => saveCode(inputEditor.getValue()));
 	//$("#compileRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
 	$("#compileRun").on("click", ()=> $("#nameModal").modal('show'));
-	$("#finalRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue()));
-	$("#outputTextArea").val('');
+	$("#finalRun").on("click", ()=> compile('http://localhost:3030/transpile',inputEditor.getValue(),out));
+	evaluator.on("keypress",()=> SendEvaluator(event,evaluator));
 }
 
-async function compile(url,code){
+async function compile(url,code,output){
 	if(code!==""){
 		let fileName = $("#name").val();
 		let formData = new FormData();
@@ -48,7 +56,7 @@ async function compile(url,code){
 		  body: formData
 		});
 		const json= await response.json();
-		$("#outputTextArea").val(json.result);
+		output.getDoc().setValue(json.result);
 		$("#compileRun").prop("disabled",false);
 	}else{
 		$("#outputTextArea").val("Text something");
@@ -71,13 +79,37 @@ function fillInfo({team,nrc,version,projectSite,repository}){
 	fillAuthors(team);
 }
 
+
+function SendEvaluator(event,evaluator){
+	var key = window.event.keyCode;
+	//alert(evaluator.getDoc().getValue())
+	if (key === 13) {
+        Evaluator(evaluator.getDoc().getValue(),evaluator);
+    }
+}
+
+async function Evaluator(code,evaluator){
+	let fileName = $("#line").val();
+	let formData = new FormData();
+	let line=code.split('\n');
+	await formData.append('line',line[line.length-1]);
+	const response= await fetch('http://localhost:3030/evaluate',{
+	  "method": 'POST',
+	  'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+	  body: formData
+	});
+	const json= await response.json();
+	evaluator.getDoc().setValue(code+'\n'+json.result);
+}
+
 function fillAuthors({members}){
 	let index=1;
 	members.forEach( (member)=> $("#author"+index++).text(member.Name+" "+member.Surnames+" "+member.id) )
 }
 function saveCode(code){
 	var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
-	saveAs(blob, "code.java");
+
+	saveAs(blob, 'file.no');
 }
 
 function showAbout(){
@@ -88,6 +120,6 @@ function clearInput(){
 	$("#outputTextArea").val('');
 }
 function clearOutput(){
-	$("#outputTextArea").val('');
+	$("#outputTextArea").setValue('');
 }
 window.addEventListener("load", init_app, false);

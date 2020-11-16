@@ -5,6 +5,6 @@ val < double > PI = 3.14
     var < [int] > L
     method <int -> int > fact(n) = 1 if n == 0 else n*fact(n-1)
     main {
-        var <int> k = 7
+        var <int> k = 10
         println(fact(k))
     }

@@ -13,16 +13,16 @@ respectivos .jar
 y una para el Server de prolog.
 
 3- En una de las 2 terminales y permaneciendo en la carpeta donde 
-se encuentra el pom.xml ingrese el comando de 
+se encuentra el archivo gradlew ingrese el comando de 
 "java --enable-preview -jar ENano-server\build\libs\ENano-server-1.0-SNAPSHOT.jar"
 con el objetivo de iniciar el servidor estatico ENano.
 
 4- En una de las 2 terminales y permaneciendo en la carpeta donde 
-se encuentra el pom.xml ingrese el comando de 
+se encuentra el archivo gradlew ingrese el comando de 
 "java --enable-preview -jar ENano-Compiler\build\libs\ENano-Compiler-1.0-SNAPSHOT.jar"
 con el objetivo de iniciar el servidor de Servicios ECompiler.
 
-5- En una de las terminales ejecutar swipl ServerTrasnpilator.pl
+5- En una nueva terminal donde se encuentra el archivo gradlew ejecutar swipl PrologServer\ServerTrasnpilator.pl
 
 6-Con ambos servidores activos estamos listos para utilizar la pagina web:
 http://localhost:5231/ para el servidor estatico.
@@ -36,6 +36,10 @@ http://localhost:pppp/info esta url tiene como objetivo pedir la informacion del
 La siguiente url corresponde al servidor de servicios , tanto por defecto y puerto de uso 
 comun corresponde a 9090
 http://localhost:pppp/compile 
+La siguiente URL corresponde a los servidores que traen el calculo de alguna clase nano
+http://localhost:pppp/evaluate 
+
+http://localhost:pppp/transpile se encarga de transpilar Nano a Java 
 
 --------------------------------------------------------------------------------------------
 Cambiar de puerto para ambos servidores:
@@ -47,5 +51,5 @@ Cambiar de puerto para ambos servidores:
 son los posibles puertos a asignar.
 
 -Caso Default:
- Si no se encuentran los archivos de properties para Enano y Ecompile se asumen
- los puertos 8080 y 9090 respectivamente.
+ Si no se encuentran los archivos de properties para Enano , Ecompile , ServerTrasnpilator se asumen
+ los puertos 8080 , 9090 y 3030 respectivamente.

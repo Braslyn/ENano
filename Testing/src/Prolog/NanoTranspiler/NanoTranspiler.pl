@@ -47,7 +47,7 @@ transpileNano(nanoProgram(Declare,Main),Name,Java):- initImports ,C='public clas
       ~s
    public static void main(String args[]){   ~s
    }
-   }', transpileprogram(Declare,Main,Decs,Lines) , write(Name) , format(atom(Class),C,[Name, Decs,Lines]),retract(imports(Imports)),format(atom(Java),'~s ~s',[Imports,Class]).
+   }', transpileprogram(Declare,Main,Decs,Lines),format(atom(Class),C,[Name, Decs,Lines]),retract(imports(Imports)),format(atom(Java),'~s ~s',[Imports,Class]).
 
 transpileprogram(declars(List1),main(List2),R1,R2):- dLines(List1,'',R1),blines(List2,'',R2).
 

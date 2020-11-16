@@ -40,7 +40,7 @@ async function compile(url,code){
 		let formData = new FormData();
 		await formData.append('name',fileName);
 		await formData.append('text',code);
-		alert(formData.getAll('name'));
+		//alert(formData.getAll('name'));
 		$("#compileRun").prop("disabled",true);
 		const response= await fetch(url,{
 		  "method": 'POST',

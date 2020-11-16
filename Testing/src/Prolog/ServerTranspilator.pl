@@ -29,37 +29,39 @@ since: 2020
     % CORS
     set_setting(http:cors, [*]), % WARNING! only for dev purposes
     server(Port).
-	
-	
+
+:- set_setting(http:cors, [*]).
+
 server(Port) :-                                            % (2)
 http_server(http_dispatch, [port(Port)]).
 
 :- http_handler('/transpile', transpile_handler ,[method(post)]). 
 
 
-transpile_handler(Request) :-
+transpile_handler(Request) :-cors_enable,
 http_parameters(Request,[name(Name),text(Text)],
          [attribute_declarations(param), 'application/x-www-form-urlencoded; charset=UTF-8']
-        ),post(Text,Name,_,Json), cors_enable,reply_json(Json,[]).
+        ),post(Text,Name,R),reply_json(json([result=R])).
 
+
+post(Text,N,Result) :- !,format(atom(Name),'./private/~s.no',[N]), 
+        save_text(Name, Text),
+        transpile(Name,N,Result),!,save_text('./private/solv.java',Result).
+        /*
+        http_post('http://localhost:9090/compile', 
+                  atom('text/plain;charset=utf-8', Text), 
+                  Result,
+                  [method(post)]).
+        */
 
 evaluate_handler(Request):- cors_enable,http_parameters(Request,[name(Name)],[attribute_declarations(param), 
-'application/x-www-form-urlencoded; charset=UTF-8']),evaluate(N,Json),reply_json(Json).
-
+                    'application/x-www-form-urlencoded; charset=UTF-8']),evaluate(Name,Json),reply_json(Json).
+        
 
 evaluate(Name,Json):- http_post('http://localhost:9090/evaluate', 
     atom('text/plain;charset=utf-8', Name), 
     Json,
-    [method(post)]). 
-
-post(Text,N,Result,R) :- format(atom(Name),'./private/~s.no',[N]), 
-        save_text(Name, Text),
-        transpile(Name,N,Result),!,
-        http_post('http://localhost:9090/compile', 
-                  atom('text/plain;charset=utf-8', Result), 
-                  R,
-                  [method(post)]).
-
+    [method(post)]),reply_json(Json). 
 
 param(text, [optional(true)]).
 param(name, [optional(true)]).

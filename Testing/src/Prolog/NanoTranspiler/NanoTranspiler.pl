@@ -12,8 +12,6 @@
    parseNanoFile/2 as parse
 ]).
 
-%:- use_module('../util/util', [yieldClassName/2]).
-
 transpileExprFile(ExprFile,Name) :-
    current_output(OutStream),
    transpileExprStream(ExprFile,Name,OutStream)
@@ -23,8 +21,8 @@ transpileExprFile(ExprFile,Name,OutFile):-
    transpileExprStream(ExprFile,Name,OutStream) 
 .
 transpileExprStream(ExprFile,Name, OutStream) :- 
-    parse(ExprFile,Tree),write(Tree),!,
-    transpileNano(Tree,Name,OutStream),write(OutStream)
+    parse(ExprFile,Tree),!,
+    transpileNano(Tree,Name,OutStream)
 .
 
 %%%%%%%%%%%%%%%%%%%%%%% import manage %%%%%%%%%%%%%%%%
@@ -32,18 +30,18 @@ transpileExprStream(ExprFile,Name, OutStream) :-
 :-dynamic unary/1.
 :-dynamic implist/1.
 
-unarImport:- (retract(unary(X)),assert(unary(X)),X==fail) -> (retract(unary(_)),assert(unary(true)),retract(imports(R)),format(atom(F),'~simport java.util.function.UnaryOperator;\n',[R])
+unarImport(_):- (retract(unary(X)),assert(unary(X)),X==fail) -> (retract(unary(_)),assert(unary(true)),retract(imports(R)),format(atom(F),'~simport java.util.function.UnaryOperator;\n',[R])
 ,assert(imports(F))).
 
-listImport:- (retract(implist(X)),assert(implist(X)),X==fail) -> (retract(implist(_)),assert(implist(true)),retract(imports(R)),format(atom(F),'~simport java.util.Arrays;
+listImport(_):- (retract(implist(X)),assert(implist(X)),X==fail) -> (retract(implist(_)),assert(implist(true)),retract(imports(R)),format(atom(F),'~simport java.util.Arrays;
 import java.util.List;\n',[R])
 ,assert(imports(F))).
 
-initImports:- retractall(unary(_)),retractall(imports(_)),retractall(implist(_)),assert(imports('')),assert(unary(fail)),assert(implist(fail)).
+initImports(_):- retractall(unary(_)),retractall(imports(_)),retractall(implist(_)),assert(imports('')),assert(unary(fail)),assert(implist(fail)).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%% Transpile Init %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-transpileNano(nanoProgram(Declare,Main),Name,Java):- initImports ,C='public class ~s {
+transpileNano(nanoProgram(Declare,Main),Name,Java):- initImports(_) ,C='public class ~s {
       ~s
    public static void main(String args[]){   ~s
    }
@@ -63,9 +61,9 @@ declare(dec(val,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R
 declare(dec(var,Type,Id,Body),R ):-  dbody(Body,R1),dtype(Type,Ty),format(atom(R),'~s ~s ~s; ',[Ty,Id,R1]).
 %dec(method, type( arrow(int,int) ) , funct( fact,[n] ) , dIf( [1],n==0,funct(f,[n-1] ) ) )
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% type for declaration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-dtype(type(arrow(X,X)),R):- changeType(X,Y),format(atom(R),'UnaryOperator<~s>',[Y]), (unarImport;true).
+dtype(type(arrow(X,X)),R):- changeType(X,Y),format(atom(R),'UnaryOperator<~s>',[Y]), (unarImport(_);true).
 dtype(type(arrow(X,Y)),R):- format(atom(R),'BinaryOperator<~s,~s>',[X,Y]).
-dtype(type(list(X)),R):- changeType(X,Y), format(atom(R),'List<~s> ',[Y]),(listImport;true).
+dtype(type(list(X)),R):- changeType(X,Y), format(atom(R),'List<~s> ',[Y]),(listImport(_);true).
 dtype(type(Type),Type).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%method body %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %mbody(dIf([F],P,B),R):- params(Param,'',P2) , format(atom(R),'{ return ( ~q )? ~q : ~q(~s); }',[P,F,Funct,P2]).
@@ -96,7 +94,7 @@ params2([F|R],Acc,Result):- simplify(F,F1),format(atom(R1),'~s,~s',[Acc,F1]), pa
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Main Lines %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 blines([],Acc,Acc).
-blines([F|R],Acc,Result):- line(F,N),format(atom(R1),'~s \n ~s',[Acc,N]),blines(R,R1,Result).
+blines([F|R],Acc,Result):- line(F,N),format(atom(R1),'~s \n ~s',[Acc,N]),!,blines(R,R1,Result).
 
 
 line(X,R):-declare(X,R).

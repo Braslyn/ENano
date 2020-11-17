@@ -231,7 +231,7 @@ public class ENCompiler extends RouterNanoHTTPD {
         public Response.IStatus getStatus() {
             return Response.Status.OK;
         }
-		@Override//Compila la clase de java
+		@Override//Evalua la clase de java
 		public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session){
 				String absoluteroute="";
 				String name="";
@@ -261,9 +261,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 					absoluteroute = file.getAbsolutePath();
 					absoluteroute=absoluteroute.replace(file.getName(),"");	
 					//----------------------------------------------------------------
-					Process p = Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1");
-					p=null;
-					Thread.sleep(100);
+					Process p = Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1 & exit");
 					//---------------------------------------------------------
 					text=Files.lines(Paths.get("solv.txt")).reduce("",(x,y)->x+y+"\\n");
 				}catch(Exception e){ text=e.getMessage();}
@@ -296,15 +294,6 @@ public class ENCompiler extends RouterNanoHTTPD {
 	public Response serve(IHTTPSession session){
 		logger.log(Level.INFO, "Connection request from "+session.getRemoteIpAddress()+" to get "+session.getUri());
 		String origin="*";
-		//System.out.println(session.getHeaders());
-		/*boolean cors_allowed= request_header!=null && 
-								"cors".equals(request_header.get("sec-fetch-mode"))&&
-								ALLOWED_SITES.indexOf(request_header.get("sec-fetch-mode"))>=0
-								&& (origin=request_header.get("origin"))!=null;
-		Response response = super.serve(session);
-		//if (cors_allowed){
-			response.addHeader("Access-Control-Allow-Origin",origin);
-		//}*/
 		Response response = super.serve(session);
 		response.addHeader("Access-Control-Allow-Origin",origin);
 		return response;

@@ -1,0 +1,9 @@
+/*
+    Demo1
+    Asuma archivo se llama Demo1.no
+  */
+  val < int -> int > abs = x -> x*17 if x >= 0 else x*-2
+  main { // Main del programa
+     var<int> x= 12
+     println(this.abs.apply(x))
+}

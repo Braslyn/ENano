@@ -196,7 +196,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 		if (diagsCollector.getDiagnostics().size() == 0){
 			//------------------------------------------------------------
 			file.delete();
-			text=String.format("{\"result\":\"%s\"}","No errors");
+			text=String.format("{\"result\":\"%s\"}","Compiled Successsfull");
             ByteArrayInputStream inp = new ByteArrayInputStream(text.getBytes());
 			Response response = newFixedLengthResponse(getStatus(), getMimeType(), inp, text.getBytes().length);
 			return response;
@@ -262,6 +262,7 @@ public class ENCompiler extends RouterNanoHTTPD {
 					absoluteroute=absoluteroute.replace(file.getName(),"");	
 					//----------------------------------------------------------------
 					Process p = Runtime.getRuntime().exec("cmd /k cd "+absoluteroute+"& java -cp classes "+name+" > solv.txt 2>&1 & exit");
+					p=null;
 					//---------------------------------------------------------
 					text=Files.lines(Paths.get("solv.txt")).reduce("",(x,y)->x+y+"\\n");
 				}catch(Exception e){ text=e.getMessage();}

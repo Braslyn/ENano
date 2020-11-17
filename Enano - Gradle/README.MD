@@ -22,12 +22,12 @@ se encuentra el archivo gradlew ingrese el comando de
 "java --enable-preview -jar ENano-Compiler\build\libs\ENano-Compiler-1.0-SNAPSHOT.jar"
 con el objetivo de iniciar el servidor de Servicios ECompiler.
 
-5- En una nueva terminal donde se encuentra el archivo gradlew y luego PrologServer\ ejecutar "swipl ServerTrasnpilator.pl"
+5- En una nueva terminal donde se encuentra el archivo gradlew abrir la carpeta PrologServer\,luego  ejecutar "swipl ServerTrasnpilator.pl"
 
 6-Con ambos servidores activos estamos listos para utilizar la pagina web:
 http://localhost:5231/ para el servidor estatico.
 
-
+7- shift+enter para ejecutar una linea en el evaluador
 Opcional:
 
 Utilizar el servers.bat para iniciar todos los servidores por defecto

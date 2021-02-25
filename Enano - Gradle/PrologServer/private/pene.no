@@ -1,0 +1,6 @@
+var <int> pene =10
+
+main{
+var <int> culo = 20
+println(pene*culo)
+}

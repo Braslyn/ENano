@@ -57,7 +57,7 @@ async function compile(url,code,output){
 		  body: formData
 		});
 		const json= await response.json();
-		output.getDoc().setValue(json.result);
+		output.getDoc().setValue(json.result+'\n'+json.state);
 		$("#compileRun").prop("disabled",false);
 	}else{
 		$("#outputTextArea").val("Text something");
